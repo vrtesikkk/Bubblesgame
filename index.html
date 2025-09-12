@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bubbles Game</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Fredoka+One&display=swap" rel="stylesheet">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+</head>
+<body>
+    <div class="background-bubbles"></div>
+    <div class="container">
+        <!-- Theme Toggle -->
+        <button id="theme-toggle" class="btn theme-toggle" title="Toggle dark/light mode">🌙</button>
+        
+        <!-- Intro Animation -->
+        <div id="intro" class="page active">
+            <div class="bubbles-container"></div>
+        </div>
+
+        <!-- Main Game Page -->
+        <div id="main-game" class="page">
+            <div class="wallet-info">
+                <span id="bubblecoins">0</span> BubbleCoins
+                <button id="open-wallet" class="btn">Open Wallet</button>
+            </div>
+            <div class="main-bubble">
+                <img src="img/bubble.png" alt="Main Bubble" id="main-bubble-img">
+                <div class="timer">Next pop in: <span id="pop-timer">2:00:00</span></div>
+            </div>
+        </div>
+
+        <!-- Missions Page -->
+        <div id="missions" class="page">
+            <h2>Missions</h2>
+            <div class="missions-list">
+                <div class="mission">
+                    <h3>Subscribe to Channel</h3>
+                    <p>Subscribe to our Telegram channel</p>
+                    <button class="btn mission-btn" data-mission="subscribe">Subscribe</button>
+                </div>
+                <div class="mission">
+                    <h3>Refer Friends</h3>
+                    <p>Invite friends and earn rewards</p>
+                    <button class="btn mission-btn" data-mission="refer">Get Referral Link</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mini Game Page -->
+        <div id="minigame" class="page">
+            <h2>Daily Mini Game</h2>
+            <div class="minigame-container">
+                <div id="minigame-timer">Next game available in: <span id="game-timer">24:00:00</span></div>
+                <div id="minigame-area"></div>
+            </div>
+        </div>
+
+        <!-- Leaderboard Page -->
+        <div id="leaderboard" class="page">
+            <h2>Leaderboard</h2>
+            <div class="leaderboard-list" id="leaderboard-list"></div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="bottom-nav">
+        <button class="nav-btn active" data-page="main-game">Home</button>
+        <button class="nav-btn" data-page="missions">Missions</button>
+        <button class="nav-btn" data-page="minigame">Mini Game</button>
+        <button class="nav-btn" data-page="leaderboard">Leaderboard</button>
+    </nav>
+
+    <!-- Wallet Connection Modal -->
+    <div id="wallet-modal" class="modal">
+        <div class="modal-content">
+            <h2>Connect Wallet</h2>
+            <p>Please connect your crypto wallet to continue</p>
+            <button id="connect-wallet" class="btn">Connect Wallet</button>
+        </div>
+    </div>
+
+    <script src="js/game.js"></script>
+</body>
+</html>
