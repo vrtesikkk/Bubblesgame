@@ -1,0 +1,667 @@
+/* ============================================================================
+   TYPOGRAPHY SYSTEM - PLAYFUL FONTS
+   ============================================================================ */
+
+/**
+ * Apply playful, rounded fonts to key UI elements
+ * Uses Google Fonts (Baloo 2, Fredoka One) for a fun, game-like appearance
+ * Falls back to system fonts for better performance
+ */
+h1, h2, h3, .main-bubble span, .congrats-table h3, .leaderboard-list, .leaderboard-entry, #bubblecoins {
+    /* Primary font stack: playful Google Fonts with system fallbacks */
+    font-family: 'Baloo 2', 'Fredoka One', cursive, Arial, sans-serif;
+    /* Slightly increased letter spacing for better readability */
+    letter-spacing: 0.5px;
+}
+
+/* ============================================================================
+   ANIMATED BACKGROUND BUBBLES SYSTEM
+   ============================================================================ */
+
+/**
+ * Container for floating background bubbles
+ * Fixed positioning covers entire viewport
+ * Low z-index keeps bubbles behind all content
+ */
+.background-bubbles {
+    position: fixed;           /* Fixed to viewport, doesn't scroll */
+    top: 0; left: 0;          /* Position at top-left corner */
+    width: 100vw; height: 100vh; /* Cover entire viewport */
+    z-index: 0;               /* Behind all other content */
+    pointer-events: none;     /* Don't interfere with user interactions */
+    overflow: hidden;         /* Hide bubbles that float outside viewport */
+}
+
+/**
+ * Individual background bubble styling
+ * Circular bubbles with gradient background and floating animation
+ */
+.background-bubble {
+    position: absolute;       /* Positioned within background-bubbles container */
+    border-radius: 50%;      /* Perfect circle shape */
+    opacity: 0.18;           /* Very subtle transparency for background effect */
+    /* Blue to white gradient for bubble-like appearance */
+    background: linear-gradient(135deg, #4a90e2 60%, #fff 100%);
+    /* Continuous floating animation from bottom to top */
+    animation: bg-bubble-float 18s linear infinite;
+}
+
+/**
+ * Keyframe animation for background bubble floating effect
+ * Bubbles start at bottom and float upward with slight scaling
+ */
+@keyframes bg-bubble-float {
+    0% { 
+        transform: translateY(0) scale(1);    /* Start at original position and size */
+    }
+    100% { 
+        transform: translateY(-120vh) scale(1.1); /* Float up beyond viewport with slight growth */
+    }
+}
+
+/* ============================================================================
+   LEADERBOARD STYLING SYSTEM
+   ============================================================================ */
+
+/**
+ * Leaderboard page container
+ * Adds top padding to account for fixed navigation
+ */
+#leaderboard {
+    padding-top: 24px;        /* Space from top of page */
+}
+
+/**
+ * Leaderboard list container
+ * Glass-morphism design with subtle transparency and blur effects
+ */
+.leaderboard-list {
+    margin: 0 auto;           /* Center horizontally */
+    max-width: 340px;         /* Constrain width for mobile optimization */
+    /* Semi-transparent white background for glass effect */
+    background: rgba(255,255,255,0.13);
+    border-radius: 16px;      /* Rounded corners for modern look */
+    /* Subtle blue shadow for depth */
+    box-shadow: 0 2px 16px 0 rgba(74,144,226,0.10);
+    padding: 18px 0 8px 0;    /* Vertical padding for content spacing */
+    backdrop-filter: blur(10px); /* Blur background for glass effect */
+}
+
+/**
+ * Individual leaderboard entry styling
+ * Flexbox layout for rank, username, and score alignment
+ */
+.leaderboard-entry {
+    display: flex;            /* Flexbox for horizontal layout */
+    align-items: center;      /* Vertical center alignment */
+    justify-content: space-between; /* Space out rank, user, and score */
+    padding: 10px 24px;       /* Internal spacing */
+    font-size: 1.15em;        /* Slightly larger text for readability */
+    /* Subtle border between entries */
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+/**
+ * Remove border from last leaderboard entry
+ * Prevents unnecessary border at bottom of list
+ */
+.leaderboard-entry:last-child {
+    border-bottom: none;
+}
+
+/**
+ * Leaderboard rank styling (1st, 2nd, 3rd, etc.)
+ * Blue color to match game theme
+ */
+.leaderboard-rank {
+    font-weight: bold;        /* Bold for emphasis */
+    color: #4a90e2;          /* Game's primary blue color */
+    margin-right: 10px;      /* Space from username */
+}
+
+/**
+ * Username styling in leaderboard
+ * Takes up remaining space and left-aligned
+ */
+.leaderboard-user {
+    flex: 1;                 /* Take up remaining horizontal space */
+    text-align: left;        /* Left-align username text */
+    font-weight: 600;        /* Semi-bold for readability */
+}
+
+/**
+ * Score styling in leaderboard
+ * Gold color to emphasize achievement
+ */
+.leaderboard-score {
+    font-weight: 700;        /* Bold for emphasis */
+    color: #FFD700;          /* Gold color for scores */
+    /* Subtle text shadow for better contrast */
+    text-shadow: 0 1px 4px #0002;
+}
+
+/* ============================================================================
+   THEME SYSTEM - DARK/LIGHT MODE SUPPORT
+   ============================================================================ */
+
+/**
+ * CSS Custom Properties (Variables) for Dark Mode
+ * Centralized color system for easy theme switching
+ */
+:root {
+    --bg-main: #232526;                    /* Dark background color */
+    --bg-card: rgba(255,255,255,0.13);    /* Semi-transparent card backgrounds */
+    --text-main: #fff;                     /* White text for dark mode */
+    --accent: #4a90e2;                     /* Primary blue accent color */
+    /* Blue shadow for bubbles and elements */
+    --bubble-shadow: 0 8px 32px 0 rgba(74,144,226,0.25);
+}
+
+/**
+ * Light Mode Theme Overrides
+ * Activated when body has 'light-mode' class
+ */
+body.light-mode {
+    --bg-main: #f5f7fa;                    /* Light gray background */
+    --bg-card: rgba(255,255,255,0.85);    /* More opaque white cards */
+    --text-main: #232526;                  /* Dark text for light mode */
+    --accent: #4a90e2;                     /* Same blue accent */
+    /* Lighter shadow for light mode */
+    --bubble-shadow: 0 8px 32px 0 rgba(74,144,226,0.13);
+}
+
+/**
+ * Apply theme variables to main body and container
+ * !important ensures theme colors override any other styles
+ */
+body, .container {
+    background: var(--bg-main) !important;  /* Use theme background color */
+    color: var(--text-main) !important;     /* Use theme text color */
+}
+
+/**
+ * Page containers use transparent backgrounds
+ * Allows theme colors to show through
+ */
+.page {
+    background: transparent !important;     /* Transparent page backgrounds */
+    color: var(--text-main) !important;     /* Use theme text color */
+}
+
+/**
+ * Card elements (congratulations, leaderboard, missions) use card background
+ * Provides contrast against main background
+ */
+.congrats-table, .leaderboard-list, .mission {
+    background: var(--bg-card) !important;  /* Use theme card background */
+    color: var(--text-main) !important;     /* Use theme text color */
+}
+
+/**
+ * Special styling for congratulations modal
+ * Transparent background with padding and rounded corners
+ */
+.congrats-table {
+    background: transparent !important;     /* Fully transparent background */
+    padding: 16px;                         /* Internal spacing */
+    border-radius: 16px;                   /* Rounded corners */
+}
+
+/* ============================================================================
+   THEME TOGGLE BUTTON STYLING
+   ============================================================================ */
+
+/**
+ * Theme toggle button (moon/sun icon)
+ * Fixed position in bottom-left corner above navigation buttons
+ */
+.theme-toggle {
+    position: fixed !important;             /* Fixed to viewport */
+    bottom: 90px !important; left: 18px !important; /* Position in bottom-left corner above nav */
+    z-index: 2000;                         /* High z-index to stay above all content */
+    width: 44px; height: 44px;             /* Circular button size */
+    border-radius: 50%;                    /* Perfect circle */
+    font-size: 1.5em;                      /* Large emoji size */
+    /* Dark gradient background for dark mode */
+    background: linear-gradient(135deg, #232526 60%, #4a90e2 100%);
+    color: #FFD700;                        /* Gold text color */
+    /* Subtle shadow for depth */
+    box-shadow: 0 2px 8px 0 rgba(74,144,226,0.10);
+    opacity: 0.92;                         /* Slightly transparent */
+    /* Smooth transitions for hover effects */
+    transition: background 0.3s, color 0.3s;
+}
+
+/**
+ * Light mode theme toggle styling
+ * Lighter gradient and dark text for light theme
+ */
+body.light-mode .theme-toggle {
+    /* Light gradient background for light mode */
+    background: linear-gradient(135deg, #fff 60%, #4a90e2 100%);
+    color: #232526;                        /* Dark text for light mode */
+}
+
+/**
+ * Hover effect for theme toggle button
+ * More vibrant colors and full opacity on hover
+ */
+.theme-toggle:hover {
+    opacity: 1;                            /* Full opacity on hover */
+    /* Bright gradient for hover state */
+    background: linear-gradient(135deg, #4a90e2 60%, #FFD700 100%);
+    color: #232526;                        /* Dark text for contrast */
+}
+
+/* ============================================================================
+   ANIMATED PAGE TRANSITIONS SYSTEM
+   ============================================================================ */
+
+/**
+ * Page transition animations
+ * Smooth fade and slide effects when switching between pages
+ */
+.page {
+    /* Smooth transitions for opacity and transform properties */
+    transition: opacity 0.5s cubic-bezier(.4,1.6,.6,1), transform 0.5s cubic-bezier(.4,1.6,.6,1);
+    /* Initial state: slightly below and transparent */
+    transform: translateY(30px);
+}
+
+/**
+ * Active page state
+ * Fully visible and in normal position
+ */
+.page.active {
+    opacity: 1;                            /* Fully opaque */
+    transform: translateY(0);              /* Normal position */
+}
+
+/* ============================================================================
+   GENERAL STYLES AND LAYOUT SYSTEM
+   ============================================================================ */
+
+/**
+ * CSS Reset - Remove default browser styling
+ * Ensures consistent appearance across different browsers
+ */
+* {
+    margin: 0;                             /* Remove default margins */
+    padding: 0;                            /* Remove default padding */
+    box-sizing: border-box;                /* Include padding/borders in element width */
+}
+
+/**
+ * Body styling with game fonts and default colors
+ * Sets up the base typography and background
+ */
+body {
+    /* Playful font stack for game-like appearance */
+    font-family: 'Baloo 2', 'Fredoka One', cursive, sans-serif;
+    margin: 0;                             /* Remove default margin */
+    background: #181c24;                   /* Dark background (overridden by theme system) */
+    color: #fff;                           /* White text (overridden by theme system) */
+}
+
+/**
+ * Main container for game content
+ * Constrains width for mobile-first design
+ */
+.container {
+    max-width: 420px;                      /* Mobile-optimized width */
+    margin: 0 auto;                        /* Center horizontally */
+    padding-bottom: 80px;                  /* Space for fixed bottom navigation */
+}
+
+/**
+ * Page container base styling
+ * Hidden by default, shown when active
+ */
+.page {
+    display: none;                         /* Hidden by default */
+    position: relative;                    /* Positioning context for child elements */
+    z-index: 1;                           /* Above background bubbles */
+}
+
+/**
+ * Active page styling
+ * Makes the page visible
+ */
+.page.active {
+    display: block;                        /* Show the page */
+}
+/* ============================================================================
+   BUBBLE ANIMATION AND GAME ELEMENTS
+   ============================================================================ */
+
+/**
+ * Intro bubbles container
+ * Full viewport size for intro animation
+ */
+.bubbles-container {
+    position: relative;                    /* Positioning context for bubbles */
+    width: 100vw; height: 100vh;          /* Full viewport size */
+    overflow: hidden;                     /* Hide bubbles outside container */
+}
+
+/**
+ * Individual bubble styling in intro animation
+ * Positioned absolutely within bubbles container
+ */
+.bubbles-container .bubble {
+    position: absolute;                   /* Absolute positioning for animation */
+}
+
+/**
+ * Main bubble game element container
+ * Centers the main clickable bubble and timer
+ */
+.main-bubble {
+    display: flex;                        /* Flexbox for vertical centering */
+    flex-direction: column;               /* Stack bubble and timer vertically */
+    align-items: center;                  /* Center horizontally */
+    margin: 32px 0;                      /* Vertical spacing */
+}
+
+/**
+ * Main clickable bubble image
+ * Large, interactive bubble for the core game mechanic
+ */
+#main-bubble-img {
+    width: 120px; height: 120px;          /* Large bubble size */
+    cursor: pointer;                      /* Show pointer cursor on hover */
+    transition: transform 0.1s;          /* Quick scale animation */
+}
+
+/**
+ * Active state for main bubble (when clicked)
+ * Slight scale down for tactile feedback
+ */
+#main-bubble-img:active {
+    transform: scale(0.95);              /* Slightly smaller when pressed */
+}
+
+/**
+ * Timer display styling
+ * Shows cooldown time for main bubble
+ */
+.timer {
+    margin-top: 14px;                    /* Space from bubble */
+    font-size: 1.15em;                   /* Slightly larger text */
+    color: #ffd700;                      /* Gold color for emphasis */
+}
+
+/**
+ * Wallet information bar
+ * Displays user's BubbleCoins and wallet connection status
+ */
+.wallet-info {
+    display: flex;                        /* Flexbox for horizontal layout */
+    align-items: center;                  /* Vertical center alignment */
+    justify-content: space-between;       /* Space out coins and button */
+    margin: 16px 0;                      /* Vertical spacing */
+    padding: 12px 16px;                  /* Internal spacing */
+    border-radius: 16px;                 /* Rounded corners */
+    /* Subtle background for contrast */
+    background: rgba(255,255,255,0.06);
+}
+
+/**
+ * BubbleCoins display styling
+ * Large, bold text for the user's coin balance
+ */
+#bubblecoins {
+    font-size: 1.3em;                    /* Larger text for emphasis */
+    font-weight: bold;                   /* Bold for readability */
+    margin-right: 8px;                   /* Space from wallet button */
+}
+/* ============================================================================
+   BUTTON SYSTEM AND INTERACTIVE ELEMENTS
+   ============================================================================ */
+
+/**
+ * Base button styling
+ * Gold theme with hover and active states
+ */
+.btn {
+    background: #ffd700;                  /* Gold background */
+    color: #181c24;                      /* Dark text for contrast */
+    border: none;                        /* Remove default border */
+    border-radius: 12px;                 /* Rounded corners */
+    padding: 12px 20px;                  /* Internal spacing */
+    font-size: 1.05em;                   /* Slightly larger text */
+    font-family: inherit;                /* Inherit game fonts */
+    cursor: pointer;                     /* Show pointer cursor */
+    margin: 6px 0;                       /* Vertical spacing between buttons */
+    /* Smooth transitions for interactive states */
+    transition: background 0.2s, transform 0.05s;
+}
+
+/**
+ * Button hover state
+ * Lighter gold color for visual feedback
+ */
+.btn:hover {
+    background: #ffe066;                 /* Lighter gold on hover */
+}
+
+/**
+ * Button active state (when pressed)
+ * Slight downward movement for tactile feedback
+ */
+.btn:active { 
+    transform: translateY(1px);          /* Move down slightly when pressed */
+}
+
+/* ============================================================================
+   BOTTOM NAVIGATION SYSTEM
+   ============================================================================ */
+
+/**
+ * Fixed bottom navigation bar
+ * Glass-morphism design with blur effect
+ */
+.bottom-nav {
+    position: fixed;                     /* Fixed to bottom of viewport */
+    left: 0; right: 0; bottom: 0;       /* Full width at bottom */
+    /* Semi-transparent dark background */
+    background: rgba(35, 40, 58, 0.8);
+    display: flex;                       /* Flexbox for horizontal layout */
+    justify-content: space-around;       /* Evenly distribute nav buttons */
+    padding: 6px 8px;                   /* Internal spacing */
+    z-index: 10;                        /* Above page content */
+    /* Subtle top border and blur effect */
+    border-top: 1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(8px);         /* Blur background for glass effect */
+}
+
+/**
+ * Navigation button styling
+ * Equal width buttons with hover and active states
+ */
+.nav-btn {
+    flex: 1;                            /* Equal width for all buttons */
+    padding: 16px 0;                    /* Vertical padding for touch targets */
+    background: rgba(255,255,255,0.06); /* Subtle background */
+    border: none;                       /* Remove default border */
+    color: #fff;                        /* White text */
+    font-size: 1.15em;                  /* Larger text for readability */
+    font-family: inherit;               /* Inherit game fonts */
+    cursor: pointer;                    /* Show pointer cursor */
+    border-radius: 12px;                /* Rounded corners */
+    /* Smooth transitions for state changes */
+    transition: background 0.2s, color 0.2s, transform 0.1s;
+}
+
+/**
+ * Active and focused navigation button
+ * Gold background with slight upward movement
+ */
+.nav-btn.active, .nav-btn:focus {
+    background: #ffd700;                /* Gold background for active state */
+    color: #181c24;                    /* Dark text for contrast */
+    transform: translateY(-2px);       /* Slight upward movement */
+}
+/* ============================================================================
+   MODAL SYSTEM
+   ============================================================================ */
+
+/**
+ * Modal overlay container
+ * Full-screen overlay for dialogs and popups
+ */
+.modal {
+    display: none;                       /* Hidden by default */
+    position: fixed;                     /* Fixed to viewport */
+    left: 0; top: 0; right: 0; bottom: 0; /* Cover entire screen */
+    background: rgba(0,0,0,0.7);        /* Semi-transparent dark overlay */
+    z-index: 100;                       /* High z-index above all content */
+    align-items: center;                /* Center content vertically */
+    justify-content: center;            /* Center content horizontally */
+}
+
+/**
+ * Active modal state
+ * Shows the modal with flexbox centering
+ */
+.modal.active {
+    display: flex;                      /* Show modal with flexbox layout */
+}
+
+/**
+ * Modal content container
+ * Styled dialog box within the modal overlay
+ */
+.modal-content {
+    background: #23283a;                /* Dark background for modal */
+    padding: 32px 24px;                /* Internal spacing */
+    border-radius: 12px;               /* Rounded corners */
+    text-align: center;                /* Center text content */
+    color: #fff;                       /* White text */
+}
+
+/* ============================================================================
+   MINIGAME AND ANIMATION ELEMENTS
+   ============================================================================ */
+
+/**
+ * Floating coin labels in minigame
+ * Show earned coins when bubbles are popped
+ */
+.coin-label {
+    position: absolute;                 /* Positioned absolutely for animation */
+    pointer-events: none;              /* Don't interfere with clicks */
+}
+
+/* ============================================================================
+   RESPONSIVE DESIGN SYSTEM
+   ============================================================================ */
+
+/**
+ * Mobile-first responsive breakpoint
+ * Adjusts container width for very small screens
+ */
+@media (max-width: 500px) {
+    .container { 
+        max-width: 100vw;              /* Full viewport width on small screens */
+    }
+}
+
+/* ============================================================================
+   ADDITIONAL STYLING OVERRIDES AND ENHANCEMENTS
+   ============================================================================ */
+
+/**
+ * Additional page transparency overrides
+ * Ensures consistent transparent backgrounds across all pages
+ */
+.page { 
+    background: transparent !important; 
+    color: var(--text-main) !important; 
+}
+
+/**
+ * Congratulations table transparency
+ * Special transparent styling for celebration messages
+ */
+.congrats-table { 
+    background: transparent !important; 
+    padding: 16px; 
+    border-radius: 16px; 
+}
+
+/**
+ * Enhanced wallet information bar styling
+ * Subtle background with proper spacing and rounded corners
+ */
+.wallet-info { 
+    padding: 12px 16px; 
+    border-radius: 16px; 
+    background: rgba(255,255,255,0.06); 
+}
+
+/**
+ * Enhanced button system with improved transitions
+ * Consolidated button styling with smooth animations
+ */
+.btn {
+    background: #ffd700; 
+    color: #181c24; 
+    border: none; 
+    border-radius: 12px;
+    padding: 12px 20px; 
+    font-size: 1.05em; 
+    transition: background .2s, transform .05s;
+}
+.btn:hover { 
+    background: #ffe066; 
+}
+.btn:active { 
+    transform: translateY(1px); 
+}
+
+/**
+ * Enhanced bottom navigation with glass-morphism
+ * Improved visual design with blur effects and better spacing
+ */
+.bottom-nav {
+    position: fixed; 
+    left: 0; right: 0; bottom: 0;
+    background: rgba(35,40,58,.8); 
+    backdrop-filter: blur(8px);
+    display: flex; 
+    justify-content: space-around; 
+    padding: 6px 8px; 
+    z-index: 10;
+    border-top: 1px solid rgba(255,255,255,.08);
+}
+
+/**
+ * Enhanced navigation button styling
+ * Improved touch targets and visual feedback
+ */
+.nav-btn {
+    flex: 1; 
+    padding: 16px 0; 
+    background: rgba(255,255,255,.06);
+    border: 0; 
+    color: #fff; 
+    font-size: 1.15em; 
+    border-radius: 12px;
+    transition: background .2s, color .2s, transform .1s;
+}
+.nav-btn.active, .nav-btn:focus { 
+    background: #ffd700; 
+    color: #181c24; 
+    transform: translateY(-2px); 
+}
+
+/**
+ * Enhanced timer readability
+ * Improved styling for countdown displays
+ */
+.timer { 
+    margin-top: 14px; 
+    font-size: 1.15em; 
+    color: #ffd700; 
+}
