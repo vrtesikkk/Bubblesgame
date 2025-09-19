@@ -101,7 +101,7 @@ body, .container {
 /* Theme Toggle Button */
 .theme-toggle {
     position: fixed;
-    top: 18px;
+    bottom: 90px; left: 18px;;
     right: 18px;
     z-index: 2000;
     width: 44px;
@@ -324,4 +324,5 @@ body {
 .nav-btn.active, .nav-btn:focus { background: #ffd700; color: #181c24; transform: translateY(-2px); }
 
 /* Timer readability */
+
 .timer { margin-top: 14px; font-size: 1.15em; color: #ffd700; }
