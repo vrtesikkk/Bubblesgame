@@ -8,13 +8,15 @@ const port = process.env.PORT || 3000;
 
 app.use(express.json());
 
-// Serve static assets for the SPA from the docs directory
-const staticDir = path.join(__dirname, 'docs');
+// Serve static assets for the SPA from the docs directory (one level up)
+// __dirname here is .../docs/js, so we resolve to the parent /docs folder
+const staticDir = path.resolve(__dirname, '..');
 app.use(express.static(staticDir));
 
 // --- Simple JSON file persistence helpers ---
 // Use a writable directory in serverless (e.g., Vercel) and local disk otherwise
-const dataDir = process.env.VERCEL ? path.join('/tmp', 'data') : path.join(__dirname, '.data');
+// Store local data alongside the docs folder (../.data)
+const dataDir = process.env.VERCEL ? path.join('/tmp', 'data') : path.resolve(__dirname, '..', '.data');
 const duelsFile = path.join(dataDir, 'duels.json');
 const cooldownFile = path.join(dataDir, 'duel_cooldowns.json');
 

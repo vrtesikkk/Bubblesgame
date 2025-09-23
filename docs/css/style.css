@@ -84,6 +84,7 @@ h1, h2, h3, .main-bubble span, .congrats-table h3, .leaderboard-list, .leaderboa
     /* Subtle blue shadow for depth */
     box-shadow: 0 2px 16px 0 rgba(74,144,226,0.10);
     padding: 18px 0 8px 0;    /* Vertical padding for content spacing */
+    -webkit-backdrop-filter: blur(10px); /* Safari support */
     backdrop-filter: blur(10px); /* Blur background for glass effect */
 }
 
@@ -472,6 +473,7 @@ body {
     z-index: 10;                        /* Above page content */
     /* Subtle top border and blur effect */
     border-top: 1px solid rgba(255,255,255,0.08);
+    -webkit-backdrop-filter: blur(8px); /* Safari support */
     backdrop-filter: blur(8px);         /* Blur background for glass effect */
 }
 
@@ -628,6 +630,7 @@ body {
     position: fixed; 
     left: 0; right: 0; bottom: 0;
     background: rgba(35,40,58,.8); 
+    -webkit-backdrop-filter: blur(8px); /* Safari support */
     backdrop-filter: blur(8px);
     display: flex; 
     justify-content: space-around; 
@@ -669,4 +672,34 @@ body {
 /* Duel page tweaks */
 #duel .duel-container {
     margin-top: 12px;
+}
+
+/* Duel link wrapper styling */
+#duel-link-wrap {
+    display: none;
+    margin-top: 8px;
+}
+
+/* Duel link input styling */
+#duel-link {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    border: 0;
+}
+
+/* Copy duel link button styling */
+#copy-duel-link {
+    margin-top: 6px;
+}
+
+/* Duel status styling */
+#duel-status {
+    margin-top: 10px;
+    opacity: 0.85;
+}
+
+/* Duel area styling */
+#duel-area {
+    margin-top: 14px;
 }
