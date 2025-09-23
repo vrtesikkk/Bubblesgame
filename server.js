@@ -13,7 +13,8 @@ const staticDir = path.join(__dirname, 'docs');
 app.use(express.static(staticDir));
 
 // --- Simple JSON file persistence helpers ---
-const dataDir = path.join(__dirname, '.data');
+// Use a writable directory in serverless (e.g., Vercel) and local disk otherwise
+const dataDir = process.env.VERCEL ? path.join('/tmp', 'data') : path.join(__dirname, '.data');
 const duelsFile = path.join(dataDir, 'duels.json');
 const cooldownFile = path.join(dataDir, 'duel_cooldowns.json');
 
