@@ -665,3 +665,8 @@ body {
     font-size: 1.15em; 
     color: #ffd700; 
 }
+
+/* Duel page tweaks */
+#duel .duel-container {
+    margin-top: 12px;
+}
