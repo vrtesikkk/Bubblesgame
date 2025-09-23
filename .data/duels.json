@@ -36,5 +36,62 @@
     },
     "status": "waiting",
     "winner": null
+  },
+  "h3j8t2nev5epeoi": {
+    "id": "h3j8t2nev5epeoi",
+    "createdAt": 1758646477458,
+    "expiresAt": 1758660877458,
+    "bubbleValues": [
+      13,
+      40,
+      27,
+      39,
+      38,
+      20,
+      48,
+      41,
+      35,
+      49,
+      19,
+      29,
+      26,
+      16,
+      32,
+      35,
+      50,
+      34,
+      38,
+      12
+    ],
+    "players": {
+      "u1": {
+        "userId": "u1",
+        "username": "Alice",
+        "poppedIndices": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "total": 157,
+        "submittedAt": 1758646477511
+      },
+      "u2": {
+        "userId": "u2",
+        "username": "Bob",
+        "poppedIndices": [
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "total": 193,
+        "submittedAt": 1758646477531
+      }
+    },
+    "status": "completed",
+    "winner": "u2"
   }
 }
