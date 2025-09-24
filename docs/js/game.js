@@ -329,6 +329,125 @@ function setupMiniGame() {
     });
 }
 
+// --- Reaction Test mode ---
+function setupReactionTest() {
+    const area = document.getElementById('reaction-area');
+    const startBtn = document.getElementById('reaction-start');
+    const timeEl = document.getElementById('reaction-time');
+    const scoreEl = document.getElementById('reaction-score-value');
+    if (!area || !startBtn || !timeEl || !scoreEl) return;
+
+    let running = false;
+    let remainingMs = 60000; // 1 minute
+    let tickTimer = null;
+    let spawnTimer = null;
+    let score = 0;
+
+    function resetUI() {
+        running = false;
+        remainingMs = 60000;
+        score = 0;
+        timeEl.textContent = '01:00';
+        scoreEl.textContent = '0';
+        area.innerHTML = '';
+        startBtn.disabled = false;
+    }
+
+    function spawnBubble() {
+        const bubble = document.createElement('img');
+        bubble.src = 'img/bubble.png';
+        bubble.style.position = 'absolute';
+        bubble.style.cursor = 'pointer';
+        const size = Math.floor(Math.random() * 40) + 30; // 30-70px
+        bubble.style.width = size + 'px';
+        bubble.style.height = 'auto';
+        const rect = area.getBoundingClientRect();
+        const maxLeft = Math.max(0, rect.width - size);
+        const maxTop = Math.max(0, rect.height - size);
+        bubble.style.left = Math.floor(Math.random() * maxLeft) + 'px';
+        bubble.style.top = Math.floor(Math.random() * maxTop) + 'px';
+        bubble.addEventListener('click', () => {
+            score++;
+            scoreEl.textContent = String(score);
+            bubble.remove();
+        }, { once: true });
+        // Auto-remove after a short while to keep the field clean
+        setTimeout(() => bubble.remove(), 2500);
+        area.appendChild(bubble);
+    }
+
+    function updateSpawnInterval() {
+        if (spawnTimer) clearInterval(spawnTimer);
+        const elapsed = 60000 - remainingMs;
+        const interval = elapsed < 30000 ? 2000 : 1000; // first 30s every 2s, last 30s every 1s
+        spawnTimer = setInterval(() => {
+            if (!running) return;
+            spawnBubble();
+        }, interval);
+    }
+
+    function format(ms) {
+        const s = Math.max(0, Math.ceil(ms / 1000));
+        const mm = String(Math.floor(s / 60)).padStart(2, '0');
+        const ss = String(s % 60).padStart(2, '0');
+        return mm + ':' + ss;
+    }
+
+    function endGame() {
+        running = false;
+        if (tickTimer) clearInterval(tickTimer);
+        if (spawnTimer) clearInterval(spawnTimer);
+        area.innerHTML = '';
+        // Show results
+        let feedback = 'Try harder!';
+        if (score >= 30 && score <= 40) feedback = 'Super!';
+        else if (score >= 20 && score <= 29) feedback = 'Good!';
+        const results = document.createElement('div');
+        results.className = 'congrats-table';
+        results.innerHTML = '<h3>Reaction Test Result</h3>' +
+            '<p>You popped <b>' + score + '</b> bubbles.</p>' +
+            '<p>' + feedback + '</p>' +
+            '<button class="btn" id="reaction-reset">Play Again</button>';
+        area.appendChild(results);
+        const resetBtn = document.getElementById('reaction-reset');
+        if (resetBtn) resetBtn.onclick = () => { resetUI(); };
+        startBtn.disabled = false;
+    }
+
+    function startGame() {
+        if (running) return;
+        running = true;
+        remainingMs = 60000;
+        score = 0;
+        area.innerHTML = '';
+        scoreEl.textContent = '0';
+        startBtn.disabled = true;
+        updateSpawnInterval();
+        // spawn immediately so player has something to click
+        spawnBubble();
+        tickTimer = setInterval(() => {
+            remainingMs -= 250; // smooth timer updates
+            if (remainingMs <= 0) {
+                timeEl.textContent = '00:00';
+                endGame();
+            } else {
+                timeEl.textContent = format(remainingMs);
+                // If we cross 30s boundary, refresh spawn rate
+                const elapsed = 60000 - remainingMs;
+                if (Math.abs(30000 - elapsed) < 200) updateSpawnInterval();
+            }
+        }, 250);
+    }
+
+    startBtn.addEventListener('click', startGame);
+    // Reset when navigating to the page
+    document.querySelector('[data-page="reaction"]').addEventListener('click', () => {
+        resetUI();
+    });
+
+    resetUI();
+}
+
 // --- Duel Mode ---
 function setupDuelMode() {
     // Temporarily disable Duel Mode (no API calls)
@@ -601,6 +720,7 @@ function init() {
     setupWalletConnection();
     setupMissions();
     setupMiniGame();
+    setupReactionTest();
     setupDuelMode();
     loadGameState();
     setInterval(updateDisplay, 1000);
