@@ -703,3 +703,19 @@ body {
 #duel-area {
     margin-top: 14px;
 }
+
+/* Reaction Test styling */
+#reaction .minigame-container {
+    padding-bottom: 100px; /* Extra space to avoid nav overlap */
+}
+
+#reaction-start {
+    position: relative;
+    z-index: 10; /* Ensure button is above nav */
+    margin-bottom: 20px;
+}
+
+#reaction-area {
+    position: relative;
+    z-index: 5;
+}
