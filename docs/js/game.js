@@ -331,6 +331,24 @@ function setupMiniGame() {
 
 // --- Duel Mode ---
 function setupDuelMode() {
+    // Temporarily disable Duel Mode (no API calls)
+    try {
+        const duelPage = document.getElementById('duel');
+        const duelStatusEl = document.getElementById('duel-status');
+        const duelControls = document.getElementById('duel-controls');
+        const duelAreaEl = document.getElementById('duel-area');
+        if (duelControls) duelControls.style.display = 'none';
+        if (duelAreaEl) duelAreaEl.innerHTML = '';
+        if (duelStatusEl) duelStatusEl.textContent = 'Duel mode is temporarily disabled.';
+        const duelNavBtn = document.querySelector('[data-page="duel"]');
+        if (duelNavBtn) {
+            duelNavBtn.addEventListener('click', () => {
+                const s = document.getElementById('duel-status');
+                if (s) s.textContent = 'Duel mode is temporarily disabled.';
+            });
+        }
+    } catch (_) {}
+    return; // Early exit to fully disable Duel Mode
     const duelArea = document.getElementById('duel-area');
     const createBtn = document.getElementById('create-duel');
     const duelLinkWrap = document.getElementById('duel-link-wrap');
@@ -338,8 +356,27 @@ function setupDuelMode() {
     const copyBtn = document.getElementById('copy-duel-link');
     const duelStatus = document.getElementById('duel-status');
 
+    // Resolve API base from URL (?api=), localStorage, or window.API_BASE
+    function resolveApiBase() {
+        try {
+            const params = new URLSearchParams(window.location.search);
+            const q = params.get('api');
+            if (q) {
+                try { localStorage.setItem('API_BASE', q); } catch (_) {}
+                return q;
+            }
+            try {
+                const s = localStorage.getItem('API_BASE');
+                if (s) return s;
+            } catch (_) {}
+        } catch (_) {}
+        return (typeof window !== 'undefined' && window.API_BASE) ? window.API_BASE : '';
+    }
+    const API_BASE = resolveApiBase();
+
     async function api(path, opts = {}) {
-        const res = await fetch(path, { headers: { 'Content-Type': 'application/json' }, ...opts });
+        const url = (API_BASE || '') + path;
+        const res = await fetch(url, { headers: { 'Content-Type': 'application/json' }, ...opts });
         if (!res.ok) throw await res.json().catch(() => ({ error: res.statusText }));
         return res.json();
     }
@@ -420,7 +457,7 @@ function setupDuelMode() {
     }
 
     async function handleDuelResult(duelId) {
-        const d = await fetch(`/api/duels/${duelId}`).then(r => r.json());
+        const d = await api(`/api/duels/${duelId}`);
         const players = Object.values(d.players);
         const me = d.players[gameState.userId];
         const other = players.find(p => p.userId !== gameState.userId);
