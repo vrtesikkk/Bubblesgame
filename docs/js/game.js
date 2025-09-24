@@ -376,8 +376,10 @@ function setupReactionTest() {
             scoreEl.textContent = String(score);
             bubble.remove();
         }, { once: true });
-        // Auto-remove after a short while to keep the field clean
-        setTimeout(() => bubble.remove(), 2500);
+        // Auto-remove timing: 2s for first 30s, 1s for last 30s
+        const elapsed = 60000 - remainingMs;
+        const removeDelay = elapsed < 30000 ? 2000 : 1000;
+        setTimeout(() => bubble.remove(), removeDelay);
         area.appendChild(bubble);
     }
 
