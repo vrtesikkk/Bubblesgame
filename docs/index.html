@@ -71,21 +71,6 @@
             </div>
         </div>
 
-        <!-- Duel Mode Page -->
-        <div id="duel" class="page">
-            <h2>Duel Mode</h2>
-            <div class="duel-container">
-                <div id="duel-controls">
-                    <button class="btn" id="create-duel">Create Duel</button>
-                    <div id="duel-link-wrap">
-                        <input id="duel-link" readonly placeholder="Duel link will appear here" />
-                        <button class="btn" id="copy-duel-link">Copy Link</button>
-                    </div>
-                    <div id="duel-status"></div>
-                </div>
-                <div id="duel-area"></div>
-            </div>
-        </div>
 
         <!-- Leaderboard Page -->
         <div id="leaderboard" class="page">
@@ -100,7 +85,6 @@
         <button class="nav-btn" data-page="missions">Missions</button>
         <button class="nav-btn" data-page="minigame">Mini Game</button>
         <button class="nav-btn" data-page="reaction">Reaction</button>
-        <button class="nav-btn" data-page="duel">Duels</button>
         <button class="nav-btn" data-page="leaderboard">Leaderboard</button>
     </nav>
 
@@ -113,8 +97,6 @@
         </div>
     </div>
 
-    <!-- Set API_BASE when hosting API separately (e.g., Render/Railway) -->
-    <script>window.API_BASE = 'https://abc123.ngrok-free.app&v=12';</script>
     <script src="js/game.js"></script>
 </body>
 

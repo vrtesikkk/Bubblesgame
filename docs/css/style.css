@@ -311,7 +311,9 @@ body {
 .container {
     max-width: 420px;                      /* Mobile-optimized width */
     margin: 0 auto;                        /* Center horizontally */
-    padding-bottom: 80px;                  /* Space for fixed bottom navigation */
+    padding-bottom: 100px;                 /* Extra space for fixed bottom navigation */
+    padding-left: 8px;                     /* Small side padding for mobile */
+    padding-right: 8px;                    /* Small side padding for mobile */
 }
 
 /**
@@ -429,11 +431,12 @@ body {
     color: #181c24;                      /* Dark text for contrast */
     border: none;                        /* Remove default border */
     border-radius: 12px;                 /* Rounded corners */
-    padding: 12px 20px;                  /* Internal spacing */
-    font-size: 1.05em;                   /* Slightly larger text */
+    padding: 14px 24px;                  /* Larger touch targets for mobile */
+    font-size: 1.1em;                    /* Slightly larger text for mobile */
     font-family: inherit;                /* Inherit game fonts */
     cursor: pointer;                     /* Show pointer cursor */
-    margin: 6px 0;                       /* Vertical spacing between buttons */
+    margin: 8px 0;                       /* Vertical spacing between buttons */
+    min-height: 48px;                    /* Minimum touch target size */
     /* Smooth transitions for interactive states */
     transition: background 0.2s, transform 0.05s;
 }
@@ -483,14 +486,15 @@ body {
  */
 .nav-btn {
     flex: 1;                            /* Equal width for all buttons */
-    padding: 16px 0;                    /* Vertical padding for touch targets */
+    padding: 18px 4px;                  /* Larger touch targets for mobile */
     background: rgba(255,255,255,0.06); /* Subtle background */
     border: none;                       /* Remove default border */
     color: #fff;                        /* White text */
-    font-size: 1.15em;                  /* Larger text for readability */
+    font-size: 1.0em;                   /* Slightly smaller for 5 buttons */
     font-family: inherit;               /* Inherit game fonts */
     cursor: pointer;                    /* Show pointer cursor */
     border-radius: 12px;                /* Rounded corners */
+    min-height: 48px;                   /* Minimum touch target size */
     /* Smooth transitions for state changes */
     transition: background 0.2s, color 0.2s, transform 0.1s;
 }
@@ -566,6 +570,18 @@ body {
 @media (max-width: 500px) {
     .container { 
         max-width: 100vw;              /* Full viewport width on small screens */
+        padding-left: 4px;             /* Minimal side padding on very small screens */
+        padding-right: 4px;            /* Minimal side padding on very small screens */
+    }
+    
+    .nav-btn {
+        font-size: 0.9em;              /* Smaller text for very small screens */
+        padding: 16px 2px;             /* Adjust padding for 5 buttons */
+    }
+    
+    .btn {
+        padding: 12px 20px;            /* Slightly smaller buttons on mobile */
+        font-size: 1.05em;             /* Adjust font size for mobile */
     }
 }
 
@@ -669,40 +685,7 @@ body {
     color: #ffd700; 
 }
 
-/* Duel page tweaks */
-#duel .duel-container {
-    margin-top: 12px;
-}
 
-/* Duel link wrapper styling */
-#duel-link-wrap {
-    display: none;
-    margin-top: 8px;
-}
-
-/* Duel link input styling */
-#duel-link {
-    width: 100%;
-    padding: 10px;
-    border-radius: 10px;
-    border: 0;
-}
-
-/* Copy duel link button styling */
-#copy-duel-link {
-    margin-top: 6px;
-}
-
-/* Duel status styling */
-#duel-status {
-    margin-top: 10px;
-    opacity: 0.85;
-}
-
-/* Duel area styling */
-#duel-area {
-    margin-top: 14px;
-}
 
 /* Reaction Test styling */
 #reaction .minigame-container {
