@@ -351,6 +351,11 @@ function setupReactionTest() {
         scoreEl.textContent = '0';
         area.innerHTML = '';
         startBtn.disabled = false;
+        startBtn.textContent = 'Start';
+        if (tickTimer) clearInterval(tickTimer);
+        if (spawnTimer) clearInterval(spawnTimer);
+        tickTimer = null;
+        spawnTimer = null;
     }
 
     function spawnBubble() {
@@ -412,6 +417,7 @@ function setupReactionTest() {
         const resetBtn = document.getElementById('reaction-reset');
         if (resetBtn) resetBtn.onclick = () => { resetUI(); };
         startBtn.disabled = false;
+        startBtn.textContent = 'Start';
     }
 
     function startGame() {
@@ -422,6 +428,7 @@ function setupReactionTest() {
         area.innerHTML = '';
         scoreEl.textContent = '0';
         startBtn.disabled = true;
+        startBtn.textContent = 'Playing...';
         updateSpawnInterval();
         // spawn immediately so player has something to click
         spawnBubble();
