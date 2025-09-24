@@ -4,8 +4,8 @@
   "private": true,
   "type": "commonjs",
   "scripts": {
-    "start": "node server.js",
-    "dev": "PORT=3000 node server.js"
+    "start": "node docs/js/server.js",
+    "dev": "PORT=3000 node docs/js/server.js"
   },
   "dependencies": {
     "express": "^4.19.2"
