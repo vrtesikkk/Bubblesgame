@@ -43,44 +43,13 @@ function setupThemeToggle() {
     setTheme(localStorage.getItem('theme') || 'dark');
 }
 
-// --- Leaderboard Logic ---
-function getLeaderboard() {
-    return JSON.parse(localStorage.getItem('bubbles_leaderboard') || '[]');
-}
-function setLeaderboard(lb) {
-    localStorage.setItem('bubbles_leaderboard', JSON.stringify(lb));
-}
-function addLeaderboardEntry(username, score) {
-    let lb = getLeaderboard();
-    lb.push({ username, score, time: Date.now() });
-    lb = lb.sort((a, b) => b.score - a.score).slice(0, 10); // Top 10
-    setLeaderboard(lb);
-}
-function renderLeaderboard() {
-    const list = document.getElementById('leaderboard-list');
-    const lb = getLeaderboard();
-    if (!lb.length) {
-        list.innerHTML = '<div style="text-align:center;opacity:0.7;">No winners yet. Play the minigame!</div>';
-        return;
-    }
-    list.innerHTML = lb.map((entry, i) => `
-        <div class="leaderboard-entry">
-            <span class="leaderboard-rank">${i + 1}</span>
-            <span class="leaderboard-user">${entry.username || 'Anonymous'}</span>
-            <span class="leaderboard-score">${entry.score}</span>
-        </div>
-    `).join('');
-}
-
-// --- Patch: Add leaderboard update to minigame win ---
+// --- Patch: Add congratulations to minigame win ---
 function showCongratulationsWithLeaderboard(total) {
-    addLeaderboardEntry(gameState.username || 'Anonymous', total);
-    renderLeaderboard();
     const minigameArea = document.getElementById('minigame-area');
     minigameArea.innerHTML = `
         <div class="congrats-table">
             <h3>Congratulations!</h3>
-            <p>You have earned <b>${total}</b> bubbles</p>
+            <p>You have earned <b>${total}</b> BubbleCoins</p>
             <button class="btn" id="back-to-home">Back to Home</button>
         </div>
     `;
@@ -90,11 +59,6 @@ function showCongratulationsWithLeaderboard(total) {
     };
 }
 
-// --- Patch navigation to render leaderboard on nav ---
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelector('[data-page="leaderboard"]').addEventListener('click', renderLeaderboard);
-});
-
 // --- Game State ---
 let gameState = {
     bubblecoins: 0,
@@ -102,7 +66,16 @@ let gameState = {
     lastMiniGameTime: null,
     walletConnected: false,
     userId: 'localuser', // fallback for local use
-    username: 'Anonymous' // fallback for local use
+    username: 'Anonymous', // fallback for local use
+    totalGamesPlayed: 0,
+    bestReactionScore: 0,
+    reactionTest: {
+        running: false,
+        remainingMs: 0,
+        tickTimer: null,
+        spawnTimer: null,
+        score: 0
+    }
 };
 
 // --- DOM Elements ---
@@ -161,6 +134,7 @@ function setupMainBubble() {
             gameState.bubblecoins += coins;
             gameState.lastPopTime = now;
             updateDisplay();
+            saveUserProgress(); // Auto-save when earning coins
             popBubble(mainBubble);
             saveGameState();
         }
@@ -200,16 +174,105 @@ function formatTime(ms) {
 
 // --- Wallet connection ---
 function setupWalletConnection() {
-    connectWalletBtn.addEventListener('click', () => {
-        gameState.walletConnected = true;
-        walletModal.classList.remove('active');
-        openWalletBtn.textContent = 'Wallet Connected';
+    // Check if Telegram WebApp is available
+    if (tg) {
+        // Initialize with Telegram user data
+        const user = tg.initDataUnsafe?.user;
+        if (user) {
+            gameState.walletConnected = true;
+            gameState.userId = user.id.toString();
+            gameState.username = user.username || user.first_name;
+            openWalletBtn.textContent = `Connected: ${user.first_name}`;
+            loadUserProgress();
+        }
+    }
+
+    connectWalletBtn.addEventListener('click', async () => {
+        if (tg) {
+            try {
+                // Request access to user data
+                await tg.requestAccess();
+                const user = tg.initDataUnsafe?.user;
+                if (user) {
+                    gameState.walletConnected = true;
+                    gameState.userId = user.id.toString();
+                    gameState.username = user.username || user.first_name;
+                    walletModal.classList.remove('active');
+                    openWalletBtn.textContent = `Connected: ${user.first_name}`;
+                    saveUserProgress();
+                    tg.showAlert('Wallet connected successfully!');
+                } else {
+                    tg.showAlert('Failed to get user data. Please try again.');
+                }
+            } catch (error) {
+                console.error('Wallet connection error:', error);
+                tg.showAlert('Failed to connect wallet. Please try again.');
+            }
+        } else {
+            // Fallback for non-Telegram environment
+            gameState.walletConnected = true;
+            gameState.userId = 'demo_user_' + Date.now();
+            gameState.username = 'Demo User';
+            walletModal.classList.remove('active');
+            openWalletBtn.textContent = 'Demo Wallet Connected';
+            saveUserProgress();
+        }
     });
+
     openWalletBtn.addEventListener('click', () => {
         if (!gameState.walletConnected) {
             walletModal.classList.add('active');
+        } else {
+            // Show wallet info
+            if (tg) {
+                tg.showAlert(`Wallet: ${gameState.username}\nBubbleCoins: ${gameState.bubblecoins}`);
+            } else {
+                alert(`Wallet: ${gameState.username}\nBubbleCoins: ${gameState.bubblecoins}`);
+            }
         }
     });
+}
+
+// --- Progress saving functions ---
+function saveUserProgress() {
+    if (gameState.walletConnected && gameState.userId) {
+        const progress = {
+            userId: gameState.userId,
+            username: gameState.username,
+            bubblecoins: gameState.bubblecoins,
+            lastPlayTime: Date.now(),
+            totalGamesPlayed: gameState.totalGamesPlayed || 0,
+            bestReactionScore: gameState.bestReactionScore || 0
+        };
+        
+        // Save to localStorage as backup
+        localStorage.setItem(`bubbles_progress_${gameState.userId}`, JSON.stringify(progress));
+        
+        // In a real app, you would send this to your server
+        console.log('Progress saved:', progress);
+        
+        if (tg) {
+            tg.HapticFeedback.impactOccurred('medium');
+        }
+    }
+}
+
+function loadUserProgress() {
+    if (gameState.walletConnected && gameState.userId) {
+        const saved = localStorage.getItem(`bubbles_progress_${gameState.userId}`);
+        if (saved) {
+            try {
+                const progress = JSON.parse(saved);
+                gameState.bubblecoins = progress.bubblecoins || 0;
+                gameState.totalGamesPlayed = progress.totalGamesPlayed || 0;
+                gameState.bestReactionScore = progress.bestReactionScore || 0;
+                updateDisplay();
+                console.log('Progress loaded:', progress);
+            } catch (error) {
+                console.error('Failed to load progress:', error);
+            }
+        }
+    }
 }
 
 // --- Missions ---
@@ -298,7 +361,9 @@ function setupMiniGame() {
                         showCongratulationsWithLeaderboard(totalCoins);
                         gameState.bubblecoins += totalCoins;
                         gameState.lastMiniGameTime = Date.now();
+                        gameState.totalGamesPlayed++;
                         updateDisplay();
+                        saveUserProgress(); // Auto-save when earning coins
                         saveGameState();
                     }, 700);
                 }
@@ -435,6 +500,42 @@ function setupReactionTest() {
                 if (Math.abs(30000 - elapsed) < 200) updateSpawnInterval();
             }
         }, 250);
+    }
+
+    function endGame() {
+        clearInterval(tickTimer);
+        clearInterval(spawnTimer);
+        running = false;
+        startBtn.disabled = false;
+        startBtn.textContent = 'Play Again';
+        
+        // Update best score
+        if (score > gameState.bestReactionScore) {
+            gameState.bestReactionScore = score;
+        }
+        
+        // Show results
+        let feedback = '';
+        if (score >= 30) {
+            feedback = 'Super!';
+        } else if (score >= 20) {
+            feedback = 'Good!';
+        } else {
+            feedback = 'Try harder!';
+        }
+        
+        area.innerHTML = `
+            <div style="text-align: center; padding: 20px; color: var(--text-primary);">
+                <h3 style="color: var(--accent-success); margin-bottom: 16px;">Game Over!</h3>
+                <p style="font-size: 1.2rem; margin-bottom: 8px;">Score: ${score}</p>
+                <p style="font-size: 1.1rem; color: var(--accent-gold); margin-bottom: 16px;">${feedback}</p>
+                <p style="font-size: 0.9rem; color: var(--text-secondary);">Best Score: ${gameState.bestReactionScore}</p>
+            </div>
+        `;
+        
+        // Save progress
+        gameState.totalGamesPlayed++;
+        saveUserProgress();
     }
 
     startBtn.addEventListener('click', startGame);

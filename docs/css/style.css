@@ -230,6 +230,13 @@ h3 {
     box-shadow: var(--shadow-sm);
 }
 
+.wallet-info > span {
+    display: flex;
+    align-items: center;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
 #bubblecoins {
     font-size: 1.5rem;
     font-weight: 700;
