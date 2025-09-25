@@ -65,6 +65,7 @@ body {
     max-width: 100%;
     margin: 0 auto;
     padding: 16px;
+    padding-top: 60px; /* Space for iPhone Dynamic Island */
     padding-bottom: 100px;
     min-height: 100vh;
 }
@@ -101,7 +102,7 @@ body {
 /* Theme Toggle */
 .theme-toggle {
     position: fixed;
-    top: 20px;
+    top: 80px; /* Moved down to avoid Dynamic Island */
     right: 20px;
     z-index: 1000;
     width: 48px;
@@ -507,6 +508,7 @@ h3 {
 @media (max-width: 480px) {
     .container {
         padding: 12px;
+        padding-top: 70px; /* Extra space for iPhone Dynamic Island on small screens */
         padding-bottom: 100px;
     }
     
@@ -536,7 +538,7 @@ h3 {
     .theme-toggle {
         width: 44px;
         height: 44px;
-        top: 16px;
+        top: 80px; /* Keep theme toggle below Dynamic Island on mobile */
         right: 16px;
     }
 }
