@@ -179,15 +179,23 @@ function formatTime(ms) {
 // --- TON Connect initialization ---
 async function initTonConnect() {
     try {
+        console.log('Initializing TON Connect...');
+        
         // Check if TonConnect is available globally
         if (typeof TonConnect !== 'undefined') {
+            console.log('TON Connect SDK found, initializing...');
+            
             // Initialize TON Connect
             tonConnect = new TonConnect({
                 manifestUrl: 'https://vrtesikkk.github.io/Bubblesgame/tonconnect-manifest.json'
             });
+            
+            console.log('TON Connect initialized');
 
             // Check if wallet is already connected
             const connectedWallets = await tonConnect.getConnectedWallets();
+            console.log('Connected wallets on init:', connectedWallets);
+            
             if (connectedWallets.length > 0) {
                 wallet = connectedWallets[0];
                 gameState.walletConnected = true;
@@ -195,9 +203,10 @@ async function initTonConnect() {
                 gameState.username = wallet.account.address.slice(0, 8) + '...';
                 openWalletBtn.textContent = `TON: ${gameState.username}`;
                 loadUserProgress();
+                console.log('Wallet already connected:', wallet.account.address);
             }
         } else {
-            console.log('TON Connect SDK not loaded');
+            console.log('TON Connect SDK not loaded - using fallback');
         }
     } catch (error) {
         console.error('TON Connect initialization error:', error);
@@ -224,16 +233,25 @@ function setupWalletConnection() {
     connectWalletBtn.addEventListener('click', async () => {
         try {
             if (tonConnect) {
-                // Connect TON wallet
+                // Get available wallets
                 const wallets = await tonConnect.getWallets();
+                console.log('Available wallets:', wallets);
+                
                 if (wallets.length > 0) {
+                    // Create connection source for the first available wallet
                     const connectionSource = {
-                        jsBridgeKey: 'tonconnect'
+                        jsBridgeKey: wallets[0].jsBridgeKey
                     };
                     
+                    console.log('Connecting to wallet:', wallets[0]);
+                    
+                    // Connect to wallet
                     await tonConnect.connect(connectionSource);
                     
+                    // Get connected wallets after connection
                     const connectedWallets = await tonConnect.getConnectedWallets();
+                    console.log('Connected wallets:', connectedWallets);
+                    
                     if (connectedWallets.length > 0) {
                         wallet = connectedWallets[0];
                         gameState.walletConnected = true;
@@ -248,6 +266,8 @@ function setupWalletConnection() {
                         } else {
                             alert('TON Wallet connected successfully!');
                         }
+                    } else {
+                        throw new Error('No wallets connected after connection attempt');
                     }
                 } else {
                     throw new Error('No TON wallets available');
