@@ -1,6 +1,10 @@
 // Initialize Telegram WebApp
 const tg = window.Telegram?.WebApp;
 
+// Initialize TON Connect
+let tonConnect = null;
+let wallet = null;
+
 // --- Animated Background Bubbles ---
 
 
@@ -172,8 +176,38 @@ function formatTime(ms) {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }
 
+// --- TON Connect initialization ---
+async function initTonConnect() {
+    try {
+        // Check if TonConnect is available globally
+        if (typeof TonConnect !== 'undefined') {
+            // Initialize TON Connect
+            tonConnect = new TonConnect({
+                manifestUrl: 'https://vrtesikkk.github.io/Bubblesgame/tonconnect-manifest.json'
+            });
+
+            // Check if wallet is already connected
+            const connectedWallets = await tonConnect.getConnectedWallets();
+            if (connectedWallets.length > 0) {
+                wallet = connectedWallets[0];
+                gameState.walletConnected = true;
+                gameState.userId = wallet.account.address;
+                gameState.username = wallet.account.address.slice(0, 8) + '...';
+                openWalletBtn.textContent = `TON: ${gameState.username}`;
+                loadUserProgress();
+            }
+        } else {
+            console.log('TON Connect SDK not loaded');
+        }
+    } catch (error) {
+        console.error('TON Connect initialization error:', error);
+    }
+}
+
 // --- Wallet connection ---
 function setupWalletConnection() {
+    // Initialize TON Connect
+    initTonConnect();
     // Check if Telegram WebApp is available
     if (tg) {
         // Initialize with Telegram user data
@@ -188,34 +222,72 @@ function setupWalletConnection() {
     }
 
     connectWalletBtn.addEventListener('click', async () => {
-        if (tg) {
-            try {
-                // Request access to user data
-                await tg.requestAccess();
-                const user = tg.initDataUnsafe?.user;
-                if (user) {
-                    gameState.walletConnected = true;
-                    gameState.userId = user.id.toString();
-                    gameState.username = user.username || user.first_name;
-                    walletModal.classList.remove('active');
-                    openWalletBtn.textContent = `Connected: ${user.first_name}`;
-                    saveUserProgress();
-                    tg.showAlert('Wallet connected successfully!');
+        try {
+            if (tonConnect) {
+                // Connect TON wallet
+                const wallets = await tonConnect.getWallets();
+                if (wallets.length > 0) {
+                    const connectionSource = {
+                        jsBridgeKey: 'tonconnect'
+                    };
+                    
+                    await tonConnect.connect(connectionSource);
+                    
+                    const connectedWallets = await tonConnect.getConnectedWallets();
+                    if (connectedWallets.length > 0) {
+                        wallet = connectedWallets[0];
+                        gameState.walletConnected = true;
+                        gameState.userId = wallet.account.address;
+                        gameState.username = wallet.account.address.slice(0, 8) + '...';
+                        walletModal.classList.remove('active');
+                        openWalletBtn.textContent = `TON: ${gameState.username}`;
+                        saveUserProgress();
+                        
+                        if (tg) {
+                            tg.showAlert('TON Wallet connected successfully!');
+                        } else {
+                            alert('TON Wallet connected successfully!');
+                        }
+                    }
                 } else {
-                    tg.showAlert('Failed to get user data. Please try again.');
+                    throw new Error('No TON wallets available');
                 }
-            } catch (error) {
-                console.error('Wallet connection error:', error);
-                tg.showAlert('Failed to connect wallet. Please try again.');
+            } else {
+                throw new Error('TON Connect not initialized');
             }
-        } else {
-            // Fallback for non-Telegram environment
-            gameState.walletConnected = true;
-            gameState.userId = 'demo_user_' + Date.now();
-            gameState.username = 'Demo User';
-            walletModal.classList.remove('active');
-            openWalletBtn.textContent = 'Demo Wallet Connected';
-            saveUserProgress();
+        } catch (error) {
+            console.error('TON wallet connection error:', error);
+            
+            // Fallback to Telegram user data
+            if (tg) {
+                try {
+                    await tg.requestAccess();
+                    const user = tg.initDataUnsafe?.user;
+                    if (user) {
+                        gameState.walletConnected = true;
+                        gameState.userId = user.id.toString();
+                        gameState.username = user.username || user.first_name;
+                        walletModal.classList.remove('active');
+                        openWalletBtn.textContent = `Telegram: ${user.first_name}`;
+                        saveUserProgress();
+                        tg.showAlert('Connected via Telegram!');
+                    } else {
+                        tg.showAlert('Failed to connect wallet. Please try again.');
+                    }
+                } catch (telegramError) {
+                    console.error('Telegram fallback error:', telegramError);
+                    tg.showAlert('Failed to connect wallet. Please try again.');
+                }
+            } else {
+                // Demo mode fallback
+                gameState.walletConnected = true;
+                gameState.userId = 'demo_user_' + Date.now();
+                gameState.username = 'Demo User';
+                walletModal.classList.remove('active');
+                openWalletBtn.textContent = 'Demo Wallet Connected';
+                saveUserProgress();
+                alert('Connected in demo mode!');
+            }
         }
     });
 
@@ -281,7 +353,7 @@ function setupMissions() {
         btn.addEventListener('click', () => {
             const mission = btn.dataset.mission;
             if (mission === 'subscribe') {
-                window.open('https://t.me/your_channel', '_blank'); // open in new tab
+                window.open('https://t.me/bubblesgameco', '_blank'); // open in new tab
             } else if (mission === 'refer') {
                 const referralLink = `https://t.me/your_bot?start=${gameState.userId}`;
                 alert(`Your referral link: ${referralLink}`);
@@ -413,10 +485,10 @@ function setupReactionTest() {
     }
 
     function spawnBubble() {
-        const bubble = document.createElement('img');
-        bubble.src = 'img/bubble.png';
-        bubble.style.position = 'absolute';
-        bubble.style.cursor = 'pointer';
+            const bubble = document.createElement('img');
+            bubble.src = 'img/bubble.png';
+            bubble.style.position = 'absolute';
+            bubble.style.cursor = 'pointer';
         const size = Math.floor(Math.random() * 40) + 30; // 30-70px
         bubble.style.width = size + 'px';
         bubble.style.height = 'auto';
@@ -425,7 +497,7 @@ function setupReactionTest() {
         const maxTop = Math.max(0, rect.height - size);
         bubble.style.left = Math.floor(Math.random() * maxLeft) + 'px';
         bubble.style.top = Math.floor(Math.random() * maxTop) + 'px';
-        bubble.addEventListener('click', () => {
+            bubble.addEventListener('click', () => {
             score++;
             scoreEl.textContent = String(score);
             bubble.remove();
@@ -520,7 +592,7 @@ function setupReactionTest() {
             feedback = 'Super!';
         } else if (score >= 20) {
             feedback = 'Good!';
-        } else {
+                    } else {
             feedback = 'Try harder!';
         }
         
