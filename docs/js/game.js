@@ -73,6 +73,9 @@ let gameState = {
     username: 'Anonymous', // fallback for local use
     totalGamesPlayed: 0,
     bestReactionScore: 0,
+    referralCode: null, // user's referral code
+    referralsCount: 0, // number of successful referrals
+    referralRewardClaimed: false, // whether 100 coin reward was claimed
     reactionTest: {
         running: false,
         remainingMs: 0,
@@ -334,7 +337,10 @@ function saveUserProgress() {
             bubblecoins: gameState.bubblecoins,
             lastPlayTime: Date.now(),
             totalGamesPlayed: gameState.totalGamesPlayed || 0,
-            bestReactionScore: gameState.bestReactionScore || 0
+            bestReactionScore: gameState.bestReactionScore || 0,
+            referralCode: gameState.referralCode,
+            referralsCount: gameState.referralsCount || 0,
+            referralRewardClaimed: gameState.referralRewardClaimed || false
         };
         
         // Save to localStorage as backup
@@ -358,12 +364,88 @@ function loadUserProgress() {
                 gameState.bubblecoins = progress.bubblecoins || 0;
                 gameState.totalGamesPlayed = progress.totalGamesPlayed || 0;
                 gameState.bestReactionScore = progress.bestReactionScore || 0;
+                gameState.referralCode = progress.referralCode;
+                gameState.referralsCount = progress.referralsCount || 0;
+                gameState.referralRewardClaimed = progress.referralRewardClaimed || false;
                 updateDisplay();
                 console.log('Progress loaded:', progress);
             } catch (error) {
                 console.error('Failed to load progress:', error);
             }
         }
+    }
+}
+
+// --- Referral System ---
+function generateReferralCode() {
+    if (!gameState.referralCode) {
+        // Generate a unique referral code based on user ID
+        const timestamp = Date.now().toString(36);
+        const random = Math.random().toString(36).substring(2, 8);
+        gameState.referralCode = `${gameState.userId}_${timestamp}_${random}`;
+        saveUserProgress();
+    }
+    return gameState.referralCode;
+}
+
+function getReferralLink() {
+    const code = generateReferralCode();
+    return `https://vrtesikkk.github.io/Bubblesgame/?ref=${code}`;
+}
+
+function checkReferralReward() {
+    if (gameState.referralsCount >= 5 && !gameState.referralRewardClaimed) {
+        gameState.bubblecoins += 100;
+        gameState.referralRewardClaimed = true;
+        updateDisplay();
+        saveUserProgress();
+        
+        if (tg) {
+            tg.showAlert('🎉 Congratulations! You earned 100 BubbleCoins for referring 5 friends!');
+        } else {
+            alert('🎉 Congratulations! You earned 100 BubbleCoins for referring 5 friends!');
+        }
+    }
+}
+
+function processReferralCode() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const refCode = urlParams.get('ref');
+    
+    if (refCode && refCode !== gameState.referralCode) {
+        // This user came from a referral link
+        const referrerUserId = refCode.split('_')[0];
+        
+        // Store referral data
+        const referralData = {
+            referrer: referrerUserId,
+            referee: gameState.userId,
+            timestamp: Date.now(),
+            code: refCode
+        };
+        
+        // Save referral locally (in a real app, this would go to a server)
+        const referrals = JSON.parse(localStorage.getItem('referrals') || '[]');
+        referrals.push(referralData);
+        localStorage.setItem('referrals', JSON.stringify(referrals));
+        
+        // Update referrer's count
+        updateReferrerCount(referrerUserId);
+        
+        console.log('Referral processed:', referralData);
+    }
+}
+
+function updateReferrerCount(referrerUserId) {
+    // Get all referrals for this referrer
+    const referrals = JSON.parse(localStorage.getItem('referrals') || '[]');
+    const referrerReferrals = referrals.filter(r => r.referrer === referrerUserId);
+    
+    // Update referrer's game state if they're the current user
+    if (referrerUserId === gameState.userId) {
+        gameState.referralsCount = referrerReferrals.length;
+        checkReferralReward();
+        saveUserProgress();
     }
 }
 
@@ -375,11 +457,59 @@ function setupMissions() {
             if (mission === 'subscribe') {
                 window.open('https://t.me/bubblesgameco', '_blank'); // open in new tab
             } else if (mission === 'refer') {
-                const referralLink = `https://t.me/your_bot?start=${gameState.userId}`;
-                alert(`Your referral link: ${referralLink}`);
+                const referralLink = getReferralLink();
+                
+                // Show sharing options
+                if (tg) {
+                    // In Telegram, show the link and allow sharing
+                    tg.showAlert(`Your referral link:\n${referralLink}\n\nShare this link with friends to earn 100 BubbleCoins when 5 people join!`);
+                } else {
+                    // In browser, copy to clipboard and show options
+                    if (navigator.share) {
+                        navigator.share({
+                            title: 'Join Bubbles Game!',
+                            text: 'Play this fun bubble game and earn rewards!',
+                            url: referralLink
+                        }).catch(err => {
+                            console.log('Share failed:', err);
+                            copyToClipboard(referralLink);
+                        });
+                    } else {
+                        copyToClipboard(referralLink);
+                    }
+                }
             }
         });
     });
+}
+
+function copyToClipboard(text) {
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+            alert(`Referral link copied to clipboard!\n\n${text}\n\nShare this link with friends to earn 100 BubbleCoins when 5 people join!`);
+        }).catch(err => {
+            console.error('Failed to copy:', err);
+            fallbackCopyToClipboard(text);
+        });
+    } else {
+        fallbackCopyToClipboard(text);
+    }
+}
+
+function fallbackCopyToClipboard(text) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+        document.execCommand('copy');
+        alert(`Referral link copied to clipboard!\n\n${text}\n\nShare this link with friends to earn 100 BubbleCoins when 5 people join!`);
+    } catch (err) {
+        console.error('Fallback copy failed:', err);
+        alert(`Your referral link:\n${text}\n\nCopy this link and share with friends to earn 100 BubbleCoins when 5 people join!`);
+    }
+    document.body.removeChild(textArea);
 }
 
 // --- Mini game ---
@@ -717,7 +847,11 @@ function init() {
         try { saveGameState(); } catch (_) {}
     });
 }
-document.addEventListener('DOMContentLoaded', init); 
+document.addEventListener('DOMContentLoaded', () => {
+    init();
+    // Initialize referral system
+    processReferralCode();
+}); 
 document.addEventListener('click', (e) => {
     if (e.target && e.target.id === 'back-to-home') { showPage('main-game'); }
   });
