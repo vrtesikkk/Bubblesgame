@@ -495,66 +495,86 @@ function setupMissions() {
                 console.log('navigator.share available:', !!navigator.share);
                 console.log('navigator.canShare available:', !!navigator.canShare);
                 console.log('User agent:', navigator.userAgent);
+                console.log('Telegram WebApp available:', !!tg);
                 
-                // Force native sharing - this should open contact/chat selection
-                if (navigator.share && navigator.canShare) {
-                    const shareData = {
-                        title: 'Join Bubbles Game!',
-                        text: 'Play this fun bubble game and earn rewards! Use my referral link to get started!',
-                        url: referralLink
-                    };
+                // Try multiple sharing methods
+                let shareAttempted = false;
+                
+                // Method 1: Try Web Share API first
+                if (navigator.share && !shareAttempted) {
+                    console.log('Attempting Web Share API...');
+                    shareAttempted = true;
                     
-                    if (navigator.canShare(shareData)) {
-                        navigator.share(shareData).then(() => {
-                            console.log('Successfully shared referral link');
-                            if (tg) {
-                                tg.HapticFeedback.impactOccurred('medium');
-                            }
-                        }).catch(err => {
-                            console.log('Share cancelled or failed:', err);
-                            // Don't fallback automatically - user cancelled
-                        });
-                    } else {
-                        // Can't share this data, try with just URL
-                        navigator.share({
-                            url: referralLink
-                        }).then(() => {
-                            console.log('Successfully shared referral link');
-                            if (tg) {
-                                tg.HapticFeedback.impactOccurred('medium');
-                            }
-                        }).catch(err => {
-                            console.log('Share cancelled or failed:', err);
-                        });
-                    }
-                } else if (navigator.share) {
-                    // Try basic share without canShare check
+                    // Try with just URL first (most compatible)
                     navigator.share({
-                        title: 'Join Bubbles Game!',
-                        text: 'Play this fun bubble game and earn rewards!',
                         url: referralLink
                     }).then(() => {
-                        console.log('Successfully shared referral link');
+                        console.log('Web Share API successful');
                         if (tg) {
                             tg.HapticFeedback.impactOccurred('medium');
                         }
                     }).catch(err => {
-                        console.log('Share cancelled or failed:', err);
-                    });
-                } else {
-                    // Try one more time with minimal data
-                    if (navigator.share) {
-                        console.log('Trying minimal share...');
-                        navigator.share({
+                        console.log('Web Share API failed:', err);
+                        // Try with full data
+                        const shareData = {
+                            title: 'Join Bubbles Game!',
+                            text: 'Play this fun bubble game and earn rewards!',
                             url: referralLink
-                        }).then(() => {
-                            console.log('Minimal share successful');
-                        }).catch(err => {
-                            console.log('Minimal share failed:', err);
+                        };
+                        
+                        navigator.share(shareData).then(() => {
+                            console.log('Web Share API with full data successful');
+                            if (tg) {
+                                tg.HapticFeedback.impactOccurred('medium');
+                            }
+                        }).catch(err2 => {
+                            console.log('Web Share API with full data failed:', err2);
+                            shareAttempted = false; // Allow fallback
                         });
-                    }
+                    });
+                }
+                
+                // Method 2: Try Telegram's openLink with share URL
+                if (tg && tg.openLink && !shareAttempted) {
+                    console.log('Attempting Telegram share...');
+                    shareAttempted = true;
                     
-                    // No native sharing available - show options
+                    const shareText = 'Join Bubbles Game! 🎮\n\nPlay this fun bubble game and earn rewards!';
+                    const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(shareText)}`;
+                    
+                    try {
+                        tg.openLink(telegramShareUrl);
+                        console.log('Telegram share opened');
+                        if (tg.HapticFeedback) {
+                            tg.HapticFeedback.impactOccurred('medium');
+                        }
+                    } catch (err) {
+                        console.log('Telegram share failed:', err);
+                        shareAttempted = false;
+                    }
+                }
+                
+                // Method 3: Try window.open with share URL
+                if (!shareAttempted) {
+                    console.log('Attempting window.open share...');
+                    shareAttempted = true;
+                    
+                    const shareText = 'Join Bubbles Game! 🎮\n\nPlay this fun bubble game and earn rewards!';
+                    const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(shareText)}`;
+                    
+                    try {
+                        window.open(shareUrl, '_blank');
+                        console.log('Window share opened');
+                    } catch (err) {
+                        console.log('Window share failed:', err);
+                        shareAttempted = false;
+                    }
+                }
+                
+                // Method 4: Fallback to popup with options
+                if (!shareAttempted) {
+                    console.log('Using fallback popup...');
+                    
                     if (tg && tg.showPopup) {
                         tg.showPopup({
                             title: 'Share Referral Link',
@@ -568,8 +588,9 @@ function setupMissions() {
                             if (buttonId === 'copy') {
                                 copyToClipboard(referralLink);
                             } else if (buttonId === 'telegram') {
-                                // Open Telegram share URL
-                                const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent('Join Bubbles Game! Play this fun bubble game and earn rewards!')}`;
+                                const shareText = 'Join Bubbles Game! 🎮\n\nPlay this fun bubble game and earn rewards!';
+                                const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(shareText)}`;
+                                
                                 if (tg.openLink) {
                                     tg.openLink(telegramShareUrl);
                                 } else {
@@ -578,7 +599,7 @@ function setupMissions() {
                             }
                         });
                     } else {
-                        // Simple fallback
+                        // Final fallback - copy to clipboard
                         copyToClipboard(referralLink);
                     }
                 }
