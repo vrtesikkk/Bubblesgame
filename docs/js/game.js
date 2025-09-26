@@ -206,6 +206,8 @@ async function initTonConnect() {
                 gameState.username = wallet.account.address.slice(0, 8) + '...';
                 openWalletBtn.textContent = `TON: ${gameState.username}`;
                 loadUserProgress();
+                // Process referral code now that user is identified
+                processReferralCode();
                 console.log('Wallet already connected:', wallet.account.address);
             }
         } else {
@@ -230,6 +232,8 @@ function setupWalletConnection() {
             gameState.username = user.username || user.first_name;
             openWalletBtn.textContent = `Connected: ${user.first_name}`;
             loadUserProgress();
+            // Process referral code now that user is identified
+            processReferralCode();
         }
     }
 
@@ -262,6 +266,9 @@ function setupWalletConnection() {
                         gameState.username = wallet.account.address.slice(0, 8) + '...';
                         walletModal.classList.remove('active');
                         openWalletBtn.textContent = `TON: ${gameState.username}`;
+                        loadUserProgress();
+                        // Process referral code now that user is identified
+                        processReferralCode();
                         saveUserProgress();
                         
                         if (tg) {
@@ -409,12 +416,20 @@ function checkReferralReward() {
 }
 
 function processReferralCode() {
+    console.log('Processing referral code...');
+    console.log('Current gameState.userId:', gameState.userId);
+    
     const urlParams = new URLSearchParams(window.location.search);
     const refCode = urlParams.get('ref');
     
-    if (refCode && refCode !== gameState.referralCode) {
+    console.log('Referral code from URL:', refCode);
+    console.log('Current user referral code:', gameState.referralCode);
+    
+    if (refCode && refCode !== gameState.referralCode && gameState.userId) {
         // This user came from a referral link
         const referrerUserId = refCode.split('_')[0];
+        
+        console.log('Processing referral for referrer:', referrerUserId);
         
         // Store referral data
         const referralData = {
@@ -433,19 +448,36 @@ function processReferralCode() {
         updateReferrerCount(referrerUserId);
         
         console.log('Referral processed:', referralData);
+        
+        // Show success message
+        if (tg) {
+            tg.showAlert('🎉 Welcome! You joined via a referral link!');
+        } else {
+            alert('🎉 Welcome! You joined via a referral link!');
+        }
+    } else {
+        console.log('No referral code to process or invalid conditions');
     }
 }
 
 function updateReferrerCount(referrerUserId) {
+    console.log('Updating referrer count for:', referrerUserId);
+    
     // Get all referrals for this referrer
     const referrals = JSON.parse(localStorage.getItem('referrals') || '[]');
     const referrerReferrals = referrals.filter(r => r.referrer === referrerUserId);
     
+    console.log('Total referrals for this user:', referrerReferrals.length);
+    console.log('Current user ID:', gameState.userId);
+    
     // Update referrer's game state if they're the current user
     if (referrerUserId === gameState.userId) {
         gameState.referralsCount = referrerReferrals.length;
+        console.log('Updated referrals count to:', gameState.referralsCount);
         checkReferralReward();
         saveUserProgress();
+    } else {
+        console.log('Referrer is not current user, not updating count');
     }
 }
 
@@ -580,13 +612,13 @@ function setupMiniGame() {
                 setTimeout(() => coinLabel.remove(), 1000);
                 if (popped === 5) {
                     setTimeout(() => {
-                        showCongratulationsWithLeaderboard(totalCoins);
                         gameState.bubblecoins += totalCoins;
                         gameState.lastMiniGameTime = Date.now();
                         gameState.totalGamesPlayed++;
                         updateDisplay();
                         saveUserProgress(); // Auto-save when earning coins
                         saveGameState();
+                        showCongratulationsWithLeaderboard(totalCoins);
                     }, 700);
                 }
             });
@@ -849,8 +881,10 @@ function init() {
 }
 document.addEventListener('DOMContentLoaded', () => {
     init();
-    // Initialize referral system
-    processReferralCode();
+    // Initialize referral system after a short delay to ensure wallet is connected
+    setTimeout(() => {
+        processReferralCode();
+    }, 1000);
 }); 
 document.addEventListener('click', (e) => {
     if (e.target && e.target.id === 'back-to-home') { showPage('main-game'); }
