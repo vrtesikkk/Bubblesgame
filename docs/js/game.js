@@ -491,12 +491,47 @@ function setupMissions() {
             } else if (mission === 'refer') {
                 const referralLink = getReferralLink();
                 
-                // Try native sharing first
-                if (navigator.share) {
-                    // Use native share API to show contact/chat selection
-                    navigator.share({
+                console.log('Share button clicked');
+                console.log('navigator.share available:', !!navigator.share);
+                console.log('navigator.canShare available:', !!navigator.canShare);
+                console.log('User agent:', navigator.userAgent);
+                
+                // Force native sharing - this should open contact/chat selection
+                if (navigator.share && navigator.canShare) {
+                    const shareData = {
                         title: 'Join Bubbles Game!',
                         text: 'Play this fun bubble game and earn rewards! Use my referral link to get started!',
+                        url: referralLink
+                    };
+                    
+                    if (navigator.canShare(shareData)) {
+                        navigator.share(shareData).then(() => {
+                            console.log('Successfully shared referral link');
+                            if (tg) {
+                                tg.HapticFeedback.impactOccurred('medium');
+                            }
+                        }).catch(err => {
+                            console.log('Share cancelled or failed:', err);
+                            // Don't fallback automatically - user cancelled
+                        });
+                    } else {
+                        // Can't share this data, try with just URL
+                        navigator.share({
+                            url: referralLink
+                        }).then(() => {
+                            console.log('Successfully shared referral link');
+                            if (tg) {
+                                tg.HapticFeedback.impactOccurred('medium');
+                            }
+                        }).catch(err => {
+                            console.log('Share cancelled or failed:', err);
+                        });
+                    }
+                } else if (navigator.share) {
+                    // Try basic share without canShare check
+                    navigator.share({
+                        title: 'Join Bubbles Game!',
+                        text: 'Play this fun bubble game and earn rewards!',
                         url: referralLink
                     }).then(() => {
                         console.log('Successfully shared referral link');
@@ -505,40 +540,47 @@ function setupMissions() {
                         }
                     }).catch(err => {
                         console.log('Share cancelled or failed:', err);
-                        // Fallback to copy to clipboard
-                        copyToClipboard(referralLink);
                     });
-                } else if (tg && tg.openLink) {
-                    // In Telegram, try to open share dialog
-                    const shareText = `Join Bubbles Game! 🎮\n\nPlay this fun bubble game and earn rewards! Use my referral link to get started!\n\n${referralLink}`;
+                } else {
+                    // Try one more time with minimal data
+                    if (navigator.share) {
+                        console.log('Trying minimal share...');
+                        navigator.share({
+                            url: referralLink
+                        }).then(() => {
+                            console.log('Minimal share successful');
+                        }).catch(err => {
+                            console.log('Minimal share failed:', err);
+                        });
+                    }
                     
-                    // Try to use Telegram's share functionality
-                    if (tg.showPopup) {
+                    // No native sharing available - show options
+                    if (tg && tg.showPopup) {
                         tg.showPopup({
                             title: 'Share Referral Link',
                             message: 'Choose how to share your referral link:',
                             buttons: [
                                 { id: 'copy', type: 'default', text: 'Copy Link' },
-                                { id: 'share', type: 'default', text: 'Share via Telegram' },
+                                { id: 'telegram', type: 'default', text: 'Share via Telegram' },
                                 { id: 'cancel', type: 'cancel', text: 'Cancel' }
                             ]
                         }, (buttonId) => {
                             if (buttonId === 'copy') {
                                 copyToClipboard(referralLink);
-                            } else if (buttonId === 'share') {
-                                // Try to open Telegram share
+                            } else if (buttonId === 'telegram') {
+                                // Open Telegram share URL
                                 const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent('Join Bubbles Game! Play this fun bubble game and earn rewards!')}`;
-                                tg.openLink(telegramShareUrl);
+                                if (tg.openLink) {
+                                    tg.openLink(telegramShareUrl);
+                                } else {
+                                    window.open(telegramShareUrl, '_blank');
+                                }
                             }
                         });
                     } else {
-                        // Fallback to alert with copy option
-                        tg.showAlert(`Your referral link:\n${referralLink}\n\nTap OK to copy the link, then share it with friends!`);
+                        // Simple fallback
                         copyToClipboard(referralLink);
                     }
-                } else {
-                    // Fallback to copy to clipboard
-                    copyToClipboard(referralLink);
                 }
             }
         });
