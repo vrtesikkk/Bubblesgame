@@ -491,24 +491,54 @@ function setupMissions() {
             } else if (mission === 'refer') {
                 const referralLink = getReferralLink();
                 
-                // Show sharing options
-                if (tg) {
-                    // In Telegram, show the link and allow sharing
-                    tg.showAlert(`Your referral link:\n${referralLink}\n\nShare this link with friends to earn 100 BubbleCoins when 5 people join!`);
-                } else {
-                    // In browser, copy to clipboard and show options
-                    if (navigator.share) {
-                        navigator.share({
-                            title: 'Join Bubbles Game!',
-                            text: 'Play this fun bubble game and earn rewards!',
-                            url: referralLink
-                        }).catch(err => {
-                            console.log('Share failed:', err);
-                            copyToClipboard(referralLink);
+                // Try native sharing first
+                if (navigator.share) {
+                    // Use native share API to show contact/chat selection
+                    navigator.share({
+                        title: 'Join Bubbles Game!',
+                        text: 'Play this fun bubble game and earn rewards! Use my referral link to get started!',
+                        url: referralLink
+                    }).then(() => {
+                        console.log('Successfully shared referral link');
+                        if (tg) {
+                            tg.HapticFeedback.impactOccurred('medium');
+                        }
+                    }).catch(err => {
+                        console.log('Share cancelled or failed:', err);
+                        // Fallback to copy to clipboard
+                        copyToClipboard(referralLink);
+                    });
+                } else if (tg && tg.openLink) {
+                    // In Telegram, try to open share dialog
+                    const shareText = `Join Bubbles Game! 🎮\n\nPlay this fun bubble game and earn rewards! Use my referral link to get started!\n\n${referralLink}`;
+                    
+                    // Try to use Telegram's share functionality
+                    if (tg.showPopup) {
+                        tg.showPopup({
+                            title: 'Share Referral Link',
+                            message: 'Choose how to share your referral link:',
+                            buttons: [
+                                { id: 'copy', type: 'default', text: 'Copy Link' },
+                                { id: 'share', type: 'default', text: 'Share via Telegram' },
+                                { id: 'cancel', type: 'cancel', text: 'Cancel' }
+                            ]
+                        }, (buttonId) => {
+                            if (buttonId === 'copy') {
+                                copyToClipboard(referralLink);
+                            } else if (buttonId === 'share') {
+                                // Try to open Telegram share
+                                const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent('Join Bubbles Game! Play this fun bubble game and earn rewards!')}`;
+                                tg.openLink(telegramShareUrl);
+                            }
                         });
                     } else {
+                        // Fallback to alert with copy option
+                        tg.showAlert(`Your referral link:\n${referralLink}\n\nTap OK to copy the link, then share it with friends!`);
                         copyToClipboard(referralLink);
                     }
+                } else {
+                    // Fallback to copy to clipboard
+                    copyToClipboard(referralLink);
                 }
             }
         });
@@ -518,7 +548,12 @@ function setupMissions() {
 function copyToClipboard(text) {
     if (navigator.clipboard) {
         navigator.clipboard.writeText(text).then(() => {
-            alert(`Referral link copied to clipboard!\n\n${text}\n\nShare this link with friends to earn 100 BubbleCoins when 5 people join!`);
+            if (tg) {
+                tg.showAlert(`✅ Referral link copied to clipboard!\n\nShare this link with friends to earn 100 BubbleCoins when 5 people join!`);
+                tg.HapticFeedback.impactOccurred('light');
+            } else {
+                alert(`✅ Referral link copied to clipboard!\n\n${text}\n\nShare this link with friends to earn 100 BubbleCoins when 5 people join!`);
+            }
         }).catch(err => {
             console.error('Failed to copy:', err);
             fallbackCopyToClipboard(text);
@@ -536,10 +571,19 @@ function fallbackCopyToClipboard(text) {
     textArea.select();
     try {
         document.execCommand('copy');
-        alert(`Referral link copied to clipboard!\n\n${text}\n\nShare this link with friends to earn 100 BubbleCoins when 5 people join!`);
+        if (tg) {
+            tg.showAlert(`✅ Referral link copied to clipboard!\n\nShare this link with friends to earn 100 BubbleCoins when 5 people join!`);
+            tg.HapticFeedback.impactOccurred('light');
+        } else {
+            alert(`✅ Referral link copied to clipboard!\n\n${text}\n\nShare this link with friends to earn 100 BubbleCoins when 5 people join!`);
+        }
     } catch (err) {
         console.error('Fallback copy failed:', err);
-        alert(`Your referral link:\n${text}\n\nCopy this link and share with friends to earn 100 BubbleCoins when 5 people join!`);
+        if (tg) {
+            tg.showAlert(`Your referral link:\n${text}\n\nCopy this link and share with friends to earn 100 BubbleCoins when 5 people join!`);
+        } else {
+            alert(`Your referral link:\n${text}\n\nCopy this link and share with friends to earn 100 BubbleCoins when 5 people join!`);
+        }
     }
     document.body.removeChild(textArea);
 }
