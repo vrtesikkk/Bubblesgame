@@ -73,6 +73,7 @@ let gameState = {
     username: 'Anonymous', // fallback for local use
     totalGamesPlayed: 0,
     bestReactionScore: 0,
+    gameStarted: false, // whether the game has been started (hides Play Game button)
     referralCode: null, // user's referral code
     referralsCount: 0, // number of successful referrals
     referralRewardClaimed: false, // whether 100 coin reward was claimed
@@ -144,6 +145,14 @@ function setupMainBubble() {
             saveUserProgress(); // Auto-save when earning coins
             popBubble(mainBubble);
             saveGameState();
+            
+            // Permanently hide the "Play Game" button when game starts
+            if (tg && tg.MainButton) {
+                tg.MainButton.hide();
+                // Store that the game has been started
+                gameState.gameStarted = true;
+                saveUserProgress();
+            }
         }
     });
 }
@@ -345,6 +354,7 @@ function saveUserProgress() {
             lastPlayTime: Date.now(),
             totalGamesPlayed: gameState.totalGamesPlayed || 0,
             bestReactionScore: gameState.bestReactionScore || 0,
+            gameStarted: gameState.gameStarted || false,
             referralCode: gameState.referralCode,
             referralsCount: gameState.referralsCount || 0,
             referralRewardClaimed: gameState.referralRewardClaimed || false
@@ -371,6 +381,7 @@ function loadUserProgress() {
                 gameState.bubblecoins = progress.bubblecoins || 0;
                 gameState.totalGamesPlayed = progress.totalGamesPlayed || 0;
                 gameState.bestReactionScore = progress.bestReactionScore || 0;
+                gameState.gameStarted = progress.gameStarted || false;
                 gameState.referralCode = progress.referralCode;
                 gameState.referralsCount = progress.referralsCount || 0;
                 gameState.referralRewardClaimed = progress.referralRewardClaimed || false;
@@ -948,14 +959,16 @@ function initTelegramWebApp() {
         // Enable closing confirmation
         tg.enableClosingConfirmation();
         
-        // Set main button if needed
-        tg.MainButton.setText('Play Game');
-        tg.MainButton.show();
-        
-        // Handle main button click
-        tg.MainButton.onClick(() => {
-            showPage('main-game');
-        });
+        // Set main button only if game hasn't been started yet
+        if (!gameState.gameStarted) {
+            tg.MainButton.setText('Play Game');
+            tg.MainButton.show();
+            
+            // Handle main button click
+            tg.MainButton.onClick(() => {
+                showPage('main-game');
+            });
+        }
         
         console.log('Telegram WebApp initialized');
     } else {
