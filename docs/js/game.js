@@ -185,6 +185,8 @@ function formatTime(ms) {
 async function initTonConnect() {
     try {
         console.log('Initializing TON Connect...');
+        console.log('TonConnect available:', typeof TonConnect !== 'undefined');
+        console.log('Manifest URL: https://vrtesikkk.github.io/Bubblesgame/tonconnect-manifest.json');
         
         // Check if TonConnect is available globally
         if (typeof TonConnect !== 'undefined') {
@@ -195,35 +197,45 @@ async function initTonConnect() {
                 manifestUrl: 'https://vrtesikkk.github.io/Bubblesgame/tonconnect-manifest.json'
             });
             
-            console.log('TON Connect initialized');
+            console.log('TON Connect initialized successfully');
 
             // Check if wallet is already connected
-            const connectedWallets = await tonConnect.getConnectedWallets();
-            console.log('Connected wallets on init:', connectedWallets);
-            
-            if (connectedWallets.length > 0) {
-                wallet = connectedWallets[0];
-                gameState.walletConnected = true;
-                gameState.userId = wallet.account.address;
-                gameState.username = wallet.account.address.slice(0, 8) + '...';
-                openWalletBtn.textContent = `TON: ${gameState.username}`;
-                loadUserProgress();
-                // Process referral code now that user is identified
-                processReferralCode();
-                console.log('Wallet already connected:', wallet.account.address);
+            try {
+                const connectedWallets = await tonConnect.getConnectedWallets();
+                console.log('Connected wallets on init:', connectedWallets);
+                
+                if (connectedWallets.length > 0) {
+                    wallet = connectedWallets[0];
+                    gameState.walletConnected = true;
+                    gameState.userId = wallet.account.address;
+                    gameState.username = wallet.account.address.slice(0, 8) + '...';
+                    openWalletBtn.textContent = `TON: ${gameState.username}`;
+                    loadUserProgress();
+                    // Process referral code now that user is identified
+                    processReferralCode();
+                    console.log('Wallet already connected:', wallet.account.address);
+                } else {
+                    console.log('No wallets currently connected');
+                }
+            } catch (walletError) {
+                console.error('Error checking connected wallets:', walletError);
             }
         } else {
             console.log('TON Connect SDK not loaded - using fallback');
+            console.log('Available globals:', Object.keys(window).filter(key => key.toLowerCase().includes('ton')));
         }
     } catch (error) {
         console.error('TON Connect initialization error:', error);
+        console.error('Error details:', error.message, error.stack);
     }
 }
 
 // --- Wallet connection ---
 function setupWalletConnection() {
-    // Initialize TON Connect
-    initTonConnect();
+    // Initialize TON Connect with a small delay to ensure SDK is loaded
+    setTimeout(() => {
+        initTonConnect();
+    }, 1000);
     // Check if Telegram WebApp is available
     if (tg) {
         // Initialize with Telegram user data
@@ -241,25 +253,33 @@ function setupWalletConnection() {
 
     connectWalletBtn.addEventListener('click', async () => {
         try {
+            console.log('Connect wallet button clicked');
+            console.log('TON Connect available:', !!tonConnect);
+            
             if (tonConnect) {
+                console.log('Getting available wallets...');
                 // Get available wallets
                 const wallets = await tonConnect.getWallets();
                 console.log('Available wallets:', wallets);
                 
                 if (wallets.length > 0) {
+                    console.log('Attempting to connect to wallet:', wallets[0].name);
+                    
                     // Create connection source for the first available wallet
                     const connectionSource = {
                         jsBridgeKey: wallets[0].jsBridgeKey
                     };
                     
+                    console.log('Connection source:', connectionSource);
                     console.log('Connecting to wallet:', wallets[0]);
                     
                     // Connect to wallet
                     await tonConnect.connect(connectionSource);
+                    console.log('Wallet connection initiated');
                     
                     // Get connected wallets after connection
                     const connectedWallets = await tonConnect.getConnectedWallets();
-                    console.log('Connected wallets:', connectedWallets);
+                    console.log('Connected wallets after connection:', connectedWallets);
                     
                     if (connectedWallets.length > 0) {
                         wallet = connectedWallets[0];
@@ -272,6 +292,8 @@ function setupWalletConnection() {
                         // Process referral code now that user is identified
                         processReferralCode();
                         saveUserProgress();
+                        
+                        console.log('Wallet connected successfully:', wallet.account.address);
                         
                         if (tg) {
                             tg.showAlert('TON Wallet connected successfully!');
@@ -289,10 +311,12 @@ function setupWalletConnection() {
             }
         } catch (error) {
             console.error('TON wallet connection error:', error);
+            console.error('Error details:', error.message, error.stack);
             
             // Fallback to Telegram user data
             if (tg) {
                 try {
+                    console.log('Attempting Telegram fallback...');
                     await tg.requestAccess();
                     const user = tg.initDataUnsafe?.user;
                     if (user) {
@@ -301,7 +325,10 @@ function setupWalletConnection() {
                         gameState.username = user.username || user.first_name;
                         walletModal.classList.remove('active');
                         openWalletBtn.textContent = `Telegram: ${user.first_name}`;
+                        loadUserProgress();
                         saveUserProgress();
+                        
+                        console.log('Connected with Telegram account:', user.first_name);
                         tg.showAlert('Connected via Telegram!');
                     } else {
                         tg.showAlert('Failed to connect wallet. Please try again.');
@@ -312,6 +339,7 @@ function setupWalletConnection() {
                 }
             } else {
                 // Demo mode fallback
+                console.log('Using demo mode fallback');
                 gameState.walletConnected = true;
                 gameState.userId = 'demo_user_' + Date.now();
                 gameState.username = 'Demo User';
