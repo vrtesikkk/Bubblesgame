@@ -93,6 +93,7 @@ const popTimer = document.getElementById('pop-timer');
 const gameTimer = document.getElementById('game-timer');
 const walletModal = document.getElementById('wallet-modal');
 const connectWalletBtn = document.getElementById('connect-wallet');
+const connectTelegramBtn = document.getElementById('connect-telegram');
 const openWalletBtn = document.getElementById('open-wallet');
 
 // --- Navigation ---
@@ -313,6 +314,13 @@ function setupWalletConnection() {
             console.error('TON wallet connection error:', error);
             console.error('Error details:', error.message, error.stack);
             
+            // Show helpful error message
+            if (tg) {
+                tg.showAlert('TON Wallet not found. Please install TON Wallet app or use Telegram Wallet. Check console for details.');
+            } else {
+                alert('TON Wallet not found. Please install TON Wallet browser extension or use Telegram Wallet.');
+            }
+            
             // Fallback to Telegram user data
             if (tg) {
                 try {
@@ -347,6 +355,41 @@ function setupWalletConnection() {
                 openWalletBtn.textContent = 'Demo Wallet Connected';
                 saveUserProgress();
                 alert('Connected in demo mode!');
+            }
+        }
+    });
+
+    // Telegram connection button
+    connectTelegramBtn.addEventListener('click', async () => {
+        try {
+            console.log('Connect via Telegram button clicked');
+            
+            if (tg) {
+                await tg.requestAccess();
+                const user = tg.initDataUnsafe?.user;
+                if (user) {
+                    gameState.walletConnected = true;
+                    gameState.userId = user.id.toString();
+                    gameState.username = user.username || user.first_name;
+                    walletModal.classList.remove('active');
+                    openWalletBtn.textContent = `Telegram: ${user.first_name}`;
+                    loadUserProgress();
+                    saveUserProgress();
+                    
+                    console.log('Connected with Telegram account:', user.first_name);
+                    tg.showAlert('Connected via Telegram!');
+                } else {
+                    tg.showAlert('Failed to get Telegram user data. Please try again.');
+                }
+            } else {
+                alert('Telegram WebApp not available. Please open this in Telegram.');
+            }
+        } catch (error) {
+            console.error('Telegram connection error:', error);
+            if (tg) {
+                tg.showAlert('Failed to connect via Telegram. Please try again.');
+            } else {
+                alert('Failed to connect via Telegram. Please try again.');
             }
         }
     });
