@@ -146,13 +146,6 @@ function setupMainBubble() {
             popBubble(mainBubble);
             saveGameState();
             
-            // Permanently hide the "Play Game" button when game starts
-            if (tg && tg.MainButton) {
-                tg.MainButton.hide();
-                // Store that the game has been started
-                gameState.gameStarted = true;
-                saveUserProgress();
-            }
         }
     });
 }
@@ -967,6 +960,10 @@ function initTelegramWebApp() {
             // Handle main button click
             tg.MainButton.onClick(() => {
                 showPage('main-game');
+                // Hide the button immediately when pressed
+                tg.MainButton.hide();
+                gameState.gameStarted = true;
+                saveUserProgress();
             });
         }
         
