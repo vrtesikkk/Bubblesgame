@@ -24,8 +24,17 @@
         <!-- Main Game Page -->
         <div id="main-game" class="page">
             <div class="wallet-info">
-                <span><span id="bubblecoins">0</span> BubbleCoins</span>
-                <button id="open-wallet" class="btn">Open Wallet</button>
+                <div class="wallet-balance">
+                    <div class="balance-icon">💰</div>
+                    <div class="balance-text">
+                        <span id="bubblecoins">0</span>
+                        <span class="balance-label">BubbleCoins</span>
+                    </div>
+                </div>
+                <button id="open-wallet" class="btn wallet-btn">
+                    <span class="btn-icon">🔗</span>
+                    <span class="btn-text">Wallet</span>
+                </button>
             </div>
             <div class="main-bubble">
                 <img src="img/bubble.png" alt="Main Bubble" id="main-bubble-img">
@@ -77,10 +86,22 @@
 
     <!-- Navigation -->
     <nav class="bottom-nav">
-        <button class="nav-btn active" data-page="main-game">Home</button>
-        <button class="nav-btn" data-page="missions">Missions</button>
-        <button class="nav-btn" data-page="minigame">Mini Game</button>
-        <button class="nav-btn" data-page="reaction">Reaction</button>
+        <button class="nav-btn active" data-page="main-game">
+            <span class="nav-icon">🏠</span>
+            <span class="nav-label">Home</span>
+        </button>
+        <button class="nav-btn" data-page="missions">
+            <span class="nav-icon">🎯</span>
+            <span class="nav-label">Missions</span>
+        </button>
+        <button class="nav-btn" data-page="minigame">
+            <span class="nav-icon">🎮</span>
+            <span class="nav-label">Mini Game</span>
+        </button>
+        <button class="nav-btn" data-page="reaction">
+            <span class="nav-icon">⚡</span>
+            <span class="nav-label">Reaction</span>
+        </button>
     </nav>
 
     <!-- Wallet Connection Modal -->
