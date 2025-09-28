@@ -457,6 +457,23 @@ h3 {
     box-shadow: var(--shadow-sm);
 }
 
+.minigame-description {
+    text-align: center;
+    margin-bottom: 20px;
+    padding: 16px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+}
+
+.minigame-description p {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--accent-primary);
+    margin: 0;
+    line-height: 1.4;
+}
+
 #minigame-timer {
     text-align: center;
     margin-bottom: 16px;
