@@ -162,14 +162,31 @@ function updateDisplay() {
             popTimer.textContent = 'Ready to pop!';
         }
     }
-    // Mini game timer - check if element exists
+    // Mini game timer - update both the hidden timer and the visible description
     const gameTimerElement = document.getElementById('game-timer');
-    if (gameState.lastMiniGameTime && gameTimerElement) {
+    const minigameTimer = document.getElementById('minigame-timer');
+    
+    if (gameState.lastMiniGameTime) {
         const timeLeft = 86400000 - (Date.now() - gameState.lastMiniGameTime);
-        if (timeLeft > 0) {
-            gameTimerElement.textContent = formatTime(timeLeft);
-        } else {
-            gameTimerElement.textContent = 'Ready to play!';
+        
+        // Update the hidden timer element
+        if (gameTimerElement) {
+            if (timeLeft > 0) {
+                gameTimerElement.textContent = formatTime(timeLeft);
+            } else {
+                gameTimerElement.textContent = 'Ready to play!';
+            }
+        }
+        
+        // Update the visible description if minigame is on cooldown
+        if (timeLeft > 0 && minigameTimer && minigameTimer.style.display !== 'none') {
+            const minigameArea = document.getElementById('minigame-area');
+            if (minigameArea) {
+                const existingDescription = minigameArea.querySelector('.minigame-description');
+                if (existingDescription && existingDescription.textContent.includes('Next game available')) {
+                    existingDescription.innerHTML = '<p>Next game available in:<br><b>' + formatTime(timeLeft) + '</b></p>';
+                }
+            }
         }
     }
 }
@@ -648,10 +665,15 @@ function setupMiniGame() {
     const minigameArea = document.getElementById('minigame-area');
     const minigameTimer = document.getElementById('minigame-timer');
     
-    // Check initial state
+    // Check initial state and update timer display
     const now = Date.now();
     if (gameState.lastMiniGameTime && now - gameState.lastMiniGameTime < 86400000) {
         if (minigameTimer) minigameTimer.style.display = 'block';
+        // Update the description with current countdown
+        const timeLeft = 86400000 - (now - gameState.lastMiniGameTime);
+        if (timeLeft > 0) {
+            minigameArea.innerHTML = '<div class="minigame-description"><p>Next game available in:<br><b>' + formatTime(timeLeft) + '</b></p></div>';
+        }
     } else {
         if (minigameTimer) minigameTimer.style.display = 'none';
     }
