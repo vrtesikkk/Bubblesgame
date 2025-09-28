@@ -762,6 +762,12 @@ function setupReactionTest() {
         if (spawnTimer) clearInterval(spawnTimer);
         tickTimer = null;
         spawnTimer = null;
+        
+        // Reset slider
+        const sliderFill = document.getElementById('slider-fill');
+        if (sliderFill) {
+            sliderFill.style.width = '0%';
+        }
     }
 
     function spawnBubble() {
@@ -850,6 +856,13 @@ function setupReactionTest() {
                 // If we cross 30s boundary, refresh spawn rate
                 const elapsed = 60000 - remainingMs;
                 if (Math.abs(30000 - elapsed) < 200) updateSpawnInterval();
+                
+                // Update slider progress
+                const progress = (elapsed / 60000) * 100;
+                const sliderFill = document.getElementById('slider-fill');
+                if (sliderFill) {
+                    sliderFill.style.width = progress + '%';
+                }
             }
         }, 250);
     }

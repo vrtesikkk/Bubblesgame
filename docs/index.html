@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bubbles Game</title>
-    <link rel="stylesheet" href="css/style.css?v=36">
+    <link rel="stylesheet" href="css/style.css?v=37">
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Fredoka+One&display=swap" rel="stylesheet">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://unpkg.com/@tonconnect/sdk@latest/dist/tonconnect-sdk.min.js" onload="console.log('TON Connect SDK loaded successfully')" onerror="console.error('Failed to load TON Connect SDK')"></script>
@@ -74,6 +74,21 @@
             <div class="minigame-container">
                 <div id="reaction-timer">Time left: <span id="reaction-time">01:00</span></div>
                 <div id="reaction-score">Score: <span id="reaction-score-value">0</span></div>
+                
+                <!-- Difficulty Progress Slider -->
+                <div class="difficulty-slider-container">
+                    <div class="slider-labels">
+                        <span class="slider-label">Easy (2s)</span>
+                        <span class="slider-label">Hard (1s)</span>
+                    </div>
+                    <div class="difficulty-slider">
+                        <div class="slider-track">
+                            <div class="slider-fill" id="slider-fill"></div>
+                            <div class="slider-divider"></div>
+                        </div>
+                    </div>
+                </div>
+                
                 <div id="reaction-area"></div>
                 <div>
                     <button class="btn" id="reaction-start">Start</button>
