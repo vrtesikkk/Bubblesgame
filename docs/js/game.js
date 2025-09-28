@@ -154,7 +154,7 @@ function setupMainBubble() {
 function updateDisplay() {
     bubblecoinsDisplay.textContent = gameState.bubblecoins;
     // Pop timer
-    if (gameState.lastPopTime) {
+    if (gameState.lastPopTime && popTimer) {
         const timeLeft = 7200000 - (Date.now() - gameState.lastPopTime);
         if (timeLeft > 0) {
             popTimer.textContent = formatTime(timeLeft);
@@ -162,13 +162,14 @@ function updateDisplay() {
             popTimer.textContent = 'Ready to pop!';
         }
     }
-    // Mini game timer
-    if (gameState.lastMiniGameTime) {
+    // Mini game timer - check if element exists
+    const gameTimerElement = document.getElementById('game-timer');
+    if (gameState.lastMiniGameTime && gameTimerElement) {
         const timeLeft = 86400000 - (Date.now() - gameState.lastMiniGameTime);
         if (timeLeft > 0) {
-            gameTimer.textContent = formatTime(timeLeft);
+            gameTimerElement.textContent = formatTime(timeLeft);
         } else {
-            gameTimer.textContent = 'Ready to play!';
+            gameTimerElement.textContent = 'Ready to play!';
         }
     }
 }
@@ -645,6 +646,15 @@ function fallbackCopyToClipboard(text) {
 // --- Mini game ---
 function setupMiniGame() {
     const minigameArea = document.getElementById('minigame-area');
+    const minigameTimer = document.getElementById('minigame-timer');
+    
+    // Check initial state
+    const now = Date.now();
+    if (gameState.lastMiniGameTime && now - gameState.lastMiniGameTime < 86400000) {
+        if (minigameTimer) minigameTimer.style.display = 'block';
+    } else {
+        if (minigameTimer) minigameTimer.style.display = 'none';
+    }
     function resetMinigameArea() {
         // Clear game content but preserve the description
         const description = minigameArea.querySelector('.minigame-description');
@@ -735,9 +745,12 @@ function setupMiniGame() {
     document.querySelector('[data-page="minigame"]').addEventListener('click', () => {
         resetMinigameArea();
         const now = Date.now();
+        const minigameTimer = document.getElementById('minigame-timer');
         if (!gameState.lastMiniGameTime || now - gameState.lastMiniGameTime >= 86400000) {
+            if (minigameTimer) minigameTimer.style.display = 'none';
             startMinigame();
         } else {
+            if (minigameTimer) minigameTimer.style.display = 'block';
             const timeLeft = 86400000 - (now - gameState.lastMiniGameTime);
             minigameArea.innerHTML = '<div class="minigame-description"><p>Next game available in:<br><b>' + formatTime(timeLeft) + '</b></p></div>';
         }
