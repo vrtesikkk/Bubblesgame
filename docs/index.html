@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bubbles Game</title>
-    <link rel="stylesheet" href="css/style.css?v=37">
+    <link rel="stylesheet" href="css/style.css?v=38">
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Fredoka+One&display=swap" rel="stylesheet">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://unpkg.com/@tonconnect/sdk@latest/dist/tonconnect-sdk.min.js" onload="console.log('TON Connect SDK loaded successfully')" onerror="console.error('Failed to load TON Connect SDK')"></script>
@@ -24,17 +24,24 @@
         <!-- Main Game Page -->
         <div id="main-game" class="page">
             <div class="wallet-info">
-                <div class="wallet-balance">
-                    <div class="balance-icon">💰</div>
-                    <div class="balance-text">
-                        <span id="bubblecoins">0</span>
-                        <span class="balance-label">BubbleCoins</span>
+                <div class="wallet-header">
+                    <div class="balance-section">
+                        <div class="balance-icon">💰</div>
+                        <div class="balance-content">
+                            <div class="balance-amount">
+                                <span id="bubblecoins">0</span>
+                                <span class="currency-symbol">BC</span>
+                            </div>
+                            <div class="balance-label">BubbleCoins</div>
+                        </div>
+                    </div>
+                    <div class="wallet-section">
+                        <button id="open-wallet" class="wallet-btn">
+                            <span class="wallet-icon">🔗</span>
+                            <span class="wallet-text">Connected: artem</span>
+                        </button>
                     </div>
                 </div>
-                <button id="open-wallet" class="btn wallet-btn">
-                    <span class="btn-icon">🔗</span>
-                    <span class="btn-text">Wallet</span>
-                </button>
             </div>
             <div class="main-bubble">
                 <img src="img/bubble.png" alt="Main Bubble" id="main-bubble-img">
