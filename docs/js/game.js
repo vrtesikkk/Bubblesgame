@@ -162,29 +162,20 @@ function updateDisplay() {
             popTimer.textContent = 'Ready to pop!';
         }
     }
-    // Mini game timer - update both the hidden timer and the visible description
-    const gameTimerElement = document.getElementById('game-timer');
-    const minigameTimer = document.getElementById('minigame-timer');
-    
+    // Mini game timer - update the middle countdown text
     if (gameState.lastMiniGameTime) {
         const timeLeft = 86400000 - (Date.now() - gameState.lastMiniGameTime);
+        const minigameArea = document.getElementById('minigame-area');
         
-        // Update the hidden timer element
-        if (gameTimerElement) {
-            if (timeLeft > 0) {
-                gameTimerElement.textContent = formatTime(timeLeft);
-            } else {
-                gameTimerElement.textContent = 'Ready to play!';
-            }
-        }
-        
-        // Update the visible description if minigame is on cooldown
-        if (timeLeft > 0 && minigameTimer && minigameTimer.style.display !== 'none') {
-            const minigameArea = document.getElementById('minigame-area');
-            if (minigameArea) {
-                const existingDescription = minigameArea.querySelector('.minigame-description');
-                if (existingDescription && existingDescription.textContent.includes('Next game available')) {
+        if (minigameArea) {
+            const existingDescription = minigameArea.querySelector('.minigame-description');
+            if (existingDescription) {
+                if (timeLeft > 0) {
+                    // Show countdown
                     existingDescription.innerHTML = '<p>Next game available in:<br><b>' + formatTime(timeLeft) + '</b></p>';
+                } else {
+                    // Show game description
+                    existingDescription.innerHTML = '<p>Pop up 5 bubbles with random quantity of bubblecoins every day!</p>';
                 }
             }
         }
@@ -663,19 +654,15 @@ function fallbackCopyToClipboard(text) {
 // --- Mini game ---
 function setupMiniGame() {
     const minigameArea = document.getElementById('minigame-area');
-    const minigameTimer = document.getElementById('minigame-timer');
     
     // Check initial state and update timer display
     const now = Date.now();
     if (gameState.lastMiniGameTime && now - gameState.lastMiniGameTime < 86400000) {
-        if (minigameTimer) minigameTimer.style.display = 'block';
         // Update the description with current countdown
         const timeLeft = 86400000 - (now - gameState.lastMiniGameTime);
         if (timeLeft > 0) {
             minigameArea.innerHTML = '<div class="minigame-description"><p>Next game available in:<br><b>' + formatTime(timeLeft) + '</b></p></div>';
         }
-    } else {
-        if (minigameTimer) minigameTimer.style.display = 'none';
     }
     function resetMinigameArea() {
         // Clear game content but preserve the description
@@ -767,12 +754,9 @@ function setupMiniGame() {
     document.querySelector('[data-page="minigame"]').addEventListener('click', () => {
         resetMinigameArea();
         const now = Date.now();
-        const minigameTimer = document.getElementById('minigame-timer');
         if (!gameState.lastMiniGameTime || now - gameState.lastMiniGameTime >= 86400000) {
-            if (minigameTimer) minigameTimer.style.display = 'none';
             startMinigame();
         } else {
-            if (minigameTimer) minigameTimer.style.display = 'block';
             const timeLeft = 86400000 - (now - gameState.lastMiniGameTime);
             minigameArea.innerHTML = '<div class="minigame-description"><p>Next game available in:<br><b>' + formatTime(timeLeft) + '</b></p></div>';
         }
