@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bubbles Game</title>
-    <link rel="stylesheet" href="css/style.css?v=39">
+    <link rel="stylesheet" href="css/style.css?v=40">
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Fredoka+One&display=swap" rel="stylesheet">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://unpkg.com/@tonconnect/sdk@latest/dist/tonconnect-sdk.min.js" onload="console.log('TON Connect SDK loaded successfully')" onerror="console.error('Failed to load TON Connect SDK')"></script>
@@ -70,11 +70,12 @@
         <div id="minigame" class="page">
             <h2>Daily Mini Game</h2>
             <div class="minigame-container">
-                <div class="minigame-description">
-                    <p>Pop up 5 bubbles with random quantity of bubblecoins every day!</p>
-                </div>
                 <div id="minigame-timer">Next game available in: <span id="game-timer">24:00:00</span></div>
-                <div id="minigame-area"></div>
+                <div id="minigame-area">
+                    <div class="minigame-description">
+                        <p>Pop up 5 bubbles with random quantity of bubblecoins every day!</p>
+                    </div>
+                </div>
             </div>
         </div>
 
