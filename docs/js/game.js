@@ -645,7 +645,6 @@ function fallbackCopyToClipboard(text) {
 // --- Mini game ---
 function setupMiniGame() {
     const minigameArea = document.getElementById('minigame-area');
-    const minigameTimer = document.getElementById('minigame-timer');
     function resetMinigameArea() {
         // Clear game content but preserve the description
         const description = minigameArea.querySelector('.minigame-description');
@@ -737,11 +736,10 @@ function setupMiniGame() {
         resetMinigameArea();
         const now = Date.now();
         if (!gameState.lastMiniGameTime || now - gameState.lastMiniGameTime >= 86400000) {
-            minigameTimer.textContent = '';
             startMinigame();
         } else {
             const timeLeft = 86400000 - (now - gameState.lastMiniGameTime);
-            minigameArea.innerHTML = '<p style="text-align:center;margin-top:100px;">Next game available in:<br><b>' + formatTime(timeLeft) + '</b></p>';
+            minigameArea.innerHTML = '<div class="minigame-description"><p>Next game available in:<br><b>' + formatTime(timeLeft) + '</b></p></div>';
         }
     });
 }
