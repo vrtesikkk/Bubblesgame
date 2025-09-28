@@ -647,7 +647,13 @@ function setupMiniGame() {
     const minigameArea = document.getElementById('minigame-area');
     const minigameTimer = document.getElementById('minigame-timer');
     function resetMinigameArea() {
+        // Clear game content but preserve the description
+        const description = minigameArea.querySelector('.minigame-description');
         minigameArea.innerHTML = '';
+        if (description) {
+            minigameArea.appendChild(description);
+            description.style.display = 'block'; // Show description when reset
+        }
         const confetti = document.querySelector('.confetti');
         if (confetti) confetti.remove();
     }
@@ -668,6 +674,11 @@ function setupMiniGame() {
     }
     function startMinigame() {
         resetMinigameArea();
+        // Hide the description when game starts
+        const description = minigameArea.querySelector('.minigame-description');
+        if (description) {
+            description.style.display = 'none';
+        }
         let popped = 0;
         let totalCoins = 0;
         const bubblesCount = 25;
