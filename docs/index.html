@@ -23,6 +23,9 @@
 
         <!-- Main Game Page -->
         <div id="main-game" class="page">
+            <div class="page-header">
+                <h2>🏠 Home</h2>
+            </div>
             <div class="wallet-info">
                 <div class="wallet-header">
                     <div class="balance-section">
@@ -43,36 +46,115 @@
                     </div>
                 </div>
             </div>
-            <div class="main-bubble">
-                <img src="img/bubble.png" alt="Main Bubble" id="main-bubble-img">
-                <div class="timer">Next pop in: <span id="pop-timer">2:00:00</span></div>
+            <div class="main-bubble-container">
+                <div class="bubble-glow"></div>
+                <div class="main-bubble">
+                    <img src="img/bubble.png" alt="Main Bubble" id="main-bubble-img">
+                    <div class="bubble-particles"></div>
+                </div>
+                <div class="timer-container">
+                    <div class="timer-icon">⏰</div>
+                    <div class="timer-content">
+                        <div class="timer-label">Next pop in:</div>
+                        <div class="timer-value" id="pop-timer">2:00:00</div>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- Missions Page -->
         <div id="missions" class="page">
-            <h2>Missions</h2>
+            <div class="page-header">
+                <h2>🎯 Missions</h2>
+                <div class="missions-info">
+                    <p>Complete missions to earn extra BubbleCoins and unlock rewards!</p>
+                </div>
+            </div>
             <div class="missions-list">
                 <div class="mission">
-                    <h3>Subscribe to Channel</h3>
-                    <p>Subscribe to our Telegram channel</p>
-                    <button class="btn mission-btn" data-mission="subscribe">Subscribe</button>
+                    <div class="mission-header">
+                        <div class="mission-icon">📢</div>
+                        <div class="mission-content">
+                            <h3>Subscribe to Channel</h3>
+                            <p>Stay updated with the latest news and announcements</p>
+                        </div>
+                    </div>
+                    <div class="mission-reward">
+                        <span class="reward-icon">💰</span>
+                        <span class="reward-text">+50 BC</span>
+                    </div>
+                    <button class="btn mission-btn" data-mission="subscribe">
+                        <span class="btn-icon">📢</span>
+                        <span>Subscribe</span>
+                    </button>
                 </div>
                 <div class="mission">
-                    <h3>Refer Friends</h3>
-                    <p>Invite 5 friends and get 100 BubbleCoins</p>
-                    <button class="btn mission-btn" data-mission="refer">Get Referral Link</button>
+                    <div class="mission-header">
+                        <div class="mission-icon">👥</div>
+                        <div class="mission-content">
+                            <h3>Refer Friends</h3>
+                            <p>Invite 5 friends and get 100 BubbleCoins bonus</p>
+                        </div>
+                    </div>
+                    <div class="mission-reward">
+                        <span class="reward-icon">💰</span>
+                        <span class="reward-text">+100 BC</span>
+                    </div>
+                    <button class="btn mission-btn" data-mission="refer">
+                        <span class="btn-icon">🔗</span>
+                        <span>Get Referral Link</span>
+                    </button>
                 </div>
             </div>
         </div>
 
         <!-- Mini Game Page -->
         <div id="minigame" class="page">
-            <h2>Daily Mini Game</h2>
+            <div class="page-header">
+                <h2>🎮 Daily Mini Game</h2>
+                <div class="game-info-card">
+                    <div class="info-icon">💎</div>
+                    <div class="info-content">
+                        <h3>Bubble Pop Challenge</h3>
+                        <p>Test your skills and earn rewards!</p>
+                    </div>
+                </div>
+            </div>
             <div class="minigame-container">
+                <div class="game-rules">
+                    <div class="rule-item">
+                        <div class="rule-icon">🎯</div>
+                        <div class="rule-text">
+                            <h4>Objective</h4>
+                            <p>Pop exactly 5 bubbles to complete the challenge</p>
+                        </div>
+                    </div>
+                    <div class="rule-item">
+                        <div class="rule-icon">💰</div>
+                        <div class="rule-text">
+                            <h4>Rewards</h4>
+                            <p>Earn 3-100 BubbleCoins per bubble popped</p>
+                        </div>
+                    </div>
+                    <div class="rule-item">
+                        <div class="rule-icon">⏰</div>
+                        <div class="rule-text">
+                            <h4>Frequency</h4>
+                            <p>Play once every 24 hours for maximum rewards</p>
+                        </div>
+                    </div>
+                </div>
                 <div id="minigame-area">
                     <div class="minigame-description">
-                        <p>Pop up 5 bubbles with random quantity of bubblecoins every day!</p>
+                        <div class="description-content">
+                            <div class="description-icon">🚀</div>
+                            <h3>Ready to Play?</h3>
+                            <p>Pop up 5 bubbles with random quantity of BubbleCoins every day!</p>
+                            <div class="reward-preview">
+                                <span class="reward-text">Potential Rewards:</span>
+                                <span class="reward-amount">15-500 BC</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -80,13 +162,36 @@
 
         <!-- Reaction Test Page -->
         <div id="reaction" class="page">
-            <h2>Reaction Test</h2>
+            <div class="page-header">
+                <h2>⚡ Reaction Test</h2>
+                <div class="reaction-info">
+                    <p>Test your reflexes and reaction speed! Pop as many bubbles as you can in 60 seconds.</p>
+                </div>
+            </div>
             <div class="minigame-container">
-                <div id="reaction-timer">Time left: <span id="reaction-time">01:00</span></div>
-                <div id="reaction-score">Score: <span id="reaction-score-value">0</span></div>
+                <div class="game-stats">
+                    <div class="stat-item">
+                        <div class="stat-icon">⏰</div>
+                        <div class="stat-content">
+                            <div class="stat-label">Time Left</div>
+                            <div class="stat-value" id="reaction-time">01:00</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">🎯</div>
+                        <div class="stat-content">
+                            <div class="stat-label">Score</div>
+                            <div class="stat-value" id="reaction-score-value">0</div>
+                        </div>
+                    </div>
+                </div>
                 
                 <!-- Difficulty Progress Slider -->
                 <div class="difficulty-slider-container">
+                    <div class="slider-header">
+                        <h4>Difficulty Progress</h4>
+                        <p>Game gets harder as time progresses</p>
+                    </div>
                     <div class="slider-labels">
                         <span class="slider-label">Easy (2s)</span>
                         <span class="slider-label">Hard (1s)</span>
@@ -100,8 +205,11 @@
                 </div>
                 
                 <div id="reaction-area"></div>
-                <div>
-                    <button class="btn" id="reaction-start">Start</button>
+                <div class="game-controls">
+                    <button class="btn" id="reaction-start">
+                        <span class="btn-icon">🚀</span>
+                        <span>Start Game</span>
+                    </button>
                 </div>
             </div>
         </div>

@@ -172,10 +172,30 @@ function updateDisplay() {
             if (existingDescription) {
                 if (timeLeft > 0) {
                     // Show countdown
-                    existingDescription.innerHTML = '<p>Next game available in:<br><b>' + formatTime(timeLeft) + '</b></p>';
+                    existingDescription.innerHTML = `
+                        <div class="description-content">
+                            <div class="description-icon">⏰</div>
+                            <h3>Game Cooldown</h3>
+                            <p>Next game available in:</p>
+                            <div class="reward-preview">
+                                <span class="reward-text">Time Remaining:</span>
+                                <span class="reward-amount">${formatTime(timeLeft)}</span>
+                            </div>
+                        </div>
+                    `;
                 } else {
                     // Show game description
-                    existingDescription.innerHTML = '<p>Pop up 5 bubbles with random quantity of bubblecoins every day!</p>';
+                    existingDescription.innerHTML = `
+                        <div class="description-content">
+                            <div class="description-icon">🚀</div>
+                            <h3>Ready to Play?</h3>
+                            <p>Pop up 5 bubbles with random quantity of BubbleCoins every day!</p>
+                            <div class="reward-preview">
+                                <span class="reward-text">Potential Rewards:</span>
+                                <span class="reward-amount">15-500 BC</span>
+                            </div>
+                        </div>
+                    `;
                 }
             }
         }
@@ -661,7 +681,19 @@ function setupMiniGame() {
         // Update the description with current countdown
         const timeLeft = 86400000 - (now - gameState.lastMiniGameTime);
         if (timeLeft > 0) {
-            minigameArea.innerHTML = '<div class="minigame-description"><p>Next game available in:<br><b>' + formatTime(timeLeft) + '</b></p></div>';
+            minigameArea.innerHTML = `
+                <div class="minigame-description">
+                    <div class="description-content">
+                        <div class="description-icon">⏰</div>
+                        <h3>Game Cooldown</h3>
+                        <p>Next game available in:</p>
+                        <div class="reward-preview">
+                            <span class="reward-text">Time Remaining:</span>
+                            <span class="reward-amount">${formatTime(timeLeft)}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
     }
     function resetMinigameArea() {
@@ -758,7 +790,19 @@ function setupMiniGame() {
             startMinigame();
         } else {
             const timeLeft = 86400000 - (now - gameState.lastMiniGameTime);
-            minigameArea.innerHTML = '<div class="minigame-description"><p>Next game available in:<br><b>' + formatTime(timeLeft) + '</b></p></div>';
+            minigameArea.innerHTML = `
+                <div class="minigame-description">
+                    <div class="description-content">
+                        <div class="description-icon">⏰</div>
+                        <h3>Game Cooldown</h3>
+                        <p>Next game available in:</p>
+                        <div class="reward-preview">
+                            <span class="reward-text">Time Remaining:</span>
+                            <span class="reward-amount">${formatTime(timeLeft)}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
     });
 }
